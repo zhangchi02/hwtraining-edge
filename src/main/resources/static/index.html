@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<style>
+ul
+{
+list-style-type:none;
+margin:0;
+padding:0;
+overflow:hidden;
+}
+li
+{
+float:left;
+}
+a:link,a:visited
+{
+display:block;
+width:120px;
+font-weight:bold;
+color:#FFFFFF;
+background-color:#bebebe;
+text-align:center;
+padding:4px;
+text-decoration:none;
+text-transform:uppercase;
+}
+a:hover,a:active
+{
+background-color:#cc0000;
+}
+
+</style>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+	url = "hwtraining-teacher-service/hwtraining/v1/tasks";
+	$(document)
+			.ready(
+					function() {
+
+						$
+								.ajax({
+									type : "GET",
+									url : url,
+									dataType : "json",
+									cache : false,
+									async : false,
+									data : "",
+									success : function(data) {
+										var s = '<table  class="tablelist" ><tr><th>班次</th><th>状态</th><th>截止时间</th><th>责任人</th><th>角色</th><th>任务</th><th>任务详情</th><th>备注</th></tr>';
+										var jsonReturn = eval(data);
+										for (var i = 0; i < jsonReturn.length; i++) {
+											s += '<tr id="'+i+'"><td >' + jsonReturn[i].classId + '</td><td><input  type="button" value="' + jsonReturn[i].status + '" onclick="changeStatus('+i+')"/></td><td>' + jsonReturn[i].deadline + '</td><td>' + jsonReturn[i].handPeople + '</td><td>'+jsonReturn[i].role+'</td><td>'+jsonReturn[i].task+'</td><td>'+jsonReturn[i].detail+'</td><td><textarea rows="3" cols="20">'+jsonReturn[i].comment+'</textarea></td></tr>';
+										}
+											s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+											$('#dv').html(s);
+									},
+									error : function(data) {
+										alert("Error!!!");
+									}
+								});
+						var taskslist = $("#taskslist").val();
+						for (var j = 0; j < taskslist; j++){
+							var btn = $("#"+j+" td:nth-child input[type='button'] ").val();
+							if(btn == "1"){
+								$("#"+j+" td:nth-child input[type='button'] ").val("已完成");
+								$("#"+j+" td:nth-child input[type='button'] ").attr("disabled","disabled");
+								$("#"+j+" td:nth-child textarea").attr("disabled","disabled");
+							}else{
+								$("#"+j+" td:nth-child input[type='button'] ").val("未完成");
+							}
+						}
+					});
+	function changeStatus(id){
+		classId = $('#'+id+' td:nth-child(1)').text();
+		task = $('#'+id+' td:nth-child(6)').text();
+		handPeople = $('#'+id+' td:nth-child(4)').text();
+		comment = $('#'+id+' td:nth-child(8) textarea').val();
+		url2 = "hwtraining-teacher-service/hwtraining/v1/tasks";
+		$.ajax({
+			type : "PUT",
+			url : url2,
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {
+				classId: classId,
+				task: task,
+				handPeople: handPeople,
+				comment: comment
+			},
+			success : function(data) {
+				$("#"+id+" td:nth-child input[type='button'] ").val("已完成");
+				$("#"+id+" td:nth-child input[type='button'] ").attr("disabled","disabled");
+				$('#'+id+' td:nth-child(8)').value=$('#'+id+' td:nth-child(8)').text();
+			},
+			error : function(data) {
+				alert("Error!!!");
+			}
+		});
+	}
+</script>
+</head>
+<body>
+<ul>
+<li><a href="index.html">培训流程管理</a></li>
+<li><a href="students.html">学员管理</a></li>
+<li><a href="score.html">成绩管理</a></li>
+<li><a href="#about">About</a></li>
+</ul>
+	<div id="dv"></div>
+</body>
+
+</html>

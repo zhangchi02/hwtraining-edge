@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<style>
+ul
+{
+list-style-type:none;
+margin:0;
+padding:0;
+overflow:hidden;
+}
+li
+{
+float:left;
+}
+a:link,a:visited
+{
+display:block;
+width:120px;
+font-weight:bold;
+color:#FFFFFF;
+background-color:#bebebe;
+text-align:center;
+padding:4px;
+text-decoration:none;
+text-transform:uppercase;
+}
+a:hover,a:active
+{
+background-color:#cc0000;
+}
+
+</style>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+	url = "hwtraining-teacher-service/hwtraining/v1/students";
+	$(document)
+			.ready(
+					function() {
+
+						$
+								.ajax({
+									type : "GET",
+									url : url,
+									contentType: "application/json",
+									dataType : "json",
+									cache : false,
+									async : false,
+									data : "",
+									success : function(data) {
+										var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>公司</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>备注</th></tr>';
+										var jsonReturn = eval(data);
+										for (var i = 0; i < jsonReturn.length; i++) {
+											s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><td >' + jsonReturn[i].classId + '</td><td>' + jsonReturn[i].companyName + '</td><td>' + jsonReturn[i].name + '</td><td>' + jsonReturn[i].title + '</td><td>'+jsonReturn[i].phoneNumber+'</td><td>'+jsonReturn[i].email+'</td><td>'+jsonReturn[i].hwcloudId+'</td><td><textarea disabled="disabled" rows="3" cols="20">'+jsonReturn[i].comment+'</textarea></td></tr>';
+										}
+											s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+											$('#dv').html(s);
+									},
+									error : function(data) {
+										alert("Error!!!");
+									}
+								});
+						$("#clickAdd").click(function(){
+					        $("#tipAdd").fadeIn(200);
+					    });
+						$("#clickDelete").click(function(){
+					        $("#tipDelete").fadeIn(200);
+					    });
+					    $(".tiptop a").click(function(){
+					        $(".tip").fadeOut(200);
+					    });
+
+					    $("#sureAdd").click(function(){
+					  	    $("#tipAdd").fadeOut(100);
+					  	    var companyName=$("#companyName").val();
+					  	    var name=$("#name").val();
+					  	    var title=$("#title").val();
+					  	    var phoneNumber=$("#phoneNumber").val();
+					  	    var email=$("#email").val();
+					  	    var hwcloudId=$("#hwcloudId").val();
+					  	    var comment=$("#comment").val();
+					  	    $.ajax({
+					  	    	type : "POST",
+								url : "hwtraining-teacher-service/hwtraining/v1/student",
+								contentType: "application/json",
+								dataType : "json",
+								cache : false,
+								async : false,
+								data : JSON.stringify({
+									"classId": "201801",
+									"companyName": companyName,
+									"name": name,
+									"title": title,
+									"phoneNumber": phoneNumber,
+									"email": email,
+									"hwcloudId": hwcloudId,
+									"comment": comment
+								}),
+								success : function(data) {
+									alert(data);
+									if(data == true){
+										window.location.reload();
+									}else{
+										alert("false!!!");
+										return;
+									}
+								},
+								error : function(data) {
+									alert("Error!!!");
+								}
+					  	        
+					  	    });
+					    });
+					    $("#sureDelete").click(function(){
+					    	$("#tipDelete").fadeOut(100);
+					    	obj = document.getElementsByName("student");
+						    check_val = [];
+						    for(k in obj){
+						        if(obj[k].checked)
+						            check_val.push(obj[k].value);
+						    }
+							url2 = "hwtraining-teacher-service/hwtraining/v1/student";
+						    for(k in check_val){
+						    	n = check_val[k];
+								classId = $('#'+n+' td:nth-child(2)').text();
+								name = $('#'+n+' td:nth-child(4)').text();
+								phoneNumber = $('#'+n+' td:nth-child(6)').text();
+								$.ajax({
+									type : "DELETE",
+									url : url2,
+									/* contentType: "application/json", */
+									dataType : "json",
+									cache : false,
+									async : false,
+									data : {
+										classId: classId,
+										name: name,
+										phoneNumber: phoneNumber
+									},
+									success : function(data) {
+										alert("success");
+									},
+									error : function(data) {
+										alert("Error!!!");
+										return;
+									}
+								});
+						    }
+						    window.location.reload();
+					    });
+					    $(".cancel").click(function(){
+					        $(".tip").fadeOut(100);
+					    });
+					});
+	
+</script>
+</head>
+<body>
+	<ul>
+<li><a href="index.html">培训流程管理</a></li>
+<li><a href="students.html">学员管理</a></li>
+<li><a href="score.html">成绩管理</a></li>
+<li><a href="#about">About</a></li>
+</ul>
+	<div class="tools">
+
+			<ul class="toolbar">
+				<li class="click" id="clickAdd"><span><img src="images/t01.png" /></span>添加</li>
+				<li class="click"><span><img src="images/t02.png" /></span>修改</li>
+				<li class="click" id="clickDelete"><span><img src="images/t03.png" /></span>删除</li>
+				<li><span><img src="images/t04.png" /></span>统计</li>
+			</ul>
+
+
+			<ul class="toolbar1">
+				<li><span><img src="images/t05.png" /></span>设置</li>
+			</ul>
+
+		</div>
+				<!-- <div id="calend" class="calend">选择日期</div> -->
+	
+	<div class="tip" id="tipAdd">
+			<div class="tiptop">
+				<span>信息</span><a></a>
+			</div>
+
+			<div class="tipinfo">
+				<!-- <span><img src="images/ticon.png" /></span> -->
+				<div class="tipright">
+					<ul class="forminfo">
+						<!-- <li><label><b>* 请仔细核对学员信息，确认无误后提交。</b></label></li> -->
+	    				<li><label>招聘企业<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="companyName" /></li>
+						<li><label>姓名<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="name" /></li>
+						<li><label>岗位<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="title" /></li>
+						<li><label>手机号<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="phoneNumber" /></li>
+						<li><label>邮箱<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="email" /></li>
+						<li><label>华为云账号<b>*</b></label><input type="text" class="dfinput" style="width:518px;" id="hwcloudId" /></li>
+						<li><label>备注</label><input type="text" class="dfinput" style="width:518px;" id="comment" /></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="tipbtn">
+				<input name="" type="button" class="sure" id="sureAdd" value="确定" />&nbsp; <input
+					name="" type="button" class="cancel" value="取消" />
+			</div>
+
+		</div>
+		<div class="tip" id="tipDelete" >
+			<div class="tiptop">
+				<span>信息</span><a></a>
+			</div>
+
+			<div class="tipinfo">
+				<span><img src="images/ticon.png" /></span>
+				<div class="tipright">
+					<p>是否确认删除所选中学员 ？</p>
+					<cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+				</div>
+			</div>
+
+			<div class="tipbtn">
+				<input name="" type="button" class="sure" id="sureDelete" value="确定" />&nbsp; 
+				<input name="" type="button" class="cancel" value="取消" />
+			</div>
+
+		</div>
+		<div id="dv"></div>
+</body>
+
+</html>

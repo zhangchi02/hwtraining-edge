@@ -1,0 +1,36 @@
+APPLICATION_ID: hwtraining
+service_description:
+  name: hwtraining-edge
+  version: 0.0.1
+cse:
+  service:
+    registry:
+      address: https://cse.cn-north-1.myhwclouds.com:443
+      instance:
+        watch: false
+  rest:
+    address: 0.0.0.0:18080
+    server:
+      thread-count: 8
+    client:
+      thread-count: 8
+  monitor:
+    client:
+      serverUri: https://cse.cn-north-1.myhwclouds.com:443
+  handler:
+    chain:
+      Provider:
+        default: bizkeeper-provider,perf-stats,qps-flowcontrol-provider
+      Consumer:
+        default: loadbalance,bizkeeper-consumer,perf-stats,qps-flowcontrol-consumer
+  config:
+    client:
+      serverUri: https://cse.cn-north-1.myhwclouds.com:443
+      refreshMode: 1
+      refresh_interval: 5000
+  credentials:
+    accessKey: SQXZYPSDEZAWY10RACO7
+    secretKey: zMgxdKKD9Fh5owFeZGNSBhgeE1iHk7YmLLm0J4Ns
+    akskCustomCipher: default
+  executors:
+    default: cse.executor.groupThreadPool
