@@ -2,6 +2,8 @@ APPLICATION_ID: hwtraining
 service_description:
   name: hwtraining-edge
   version: 0.0.1
+cse.uploads.directory: target
+cse.uploads.maxSize: 1000000
 cse:
   service:
     registry:

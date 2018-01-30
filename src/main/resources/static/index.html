@@ -96,6 +96,7 @@ background-color:#cc0000;
 				$("#"+id+" td:nth-child input[type='button'] ").val("已完成");
 				$("#"+id+" td:nth-child input[type='button'] ").attr("disabled","disabled");
 				$('#'+id+' td:nth-child(8)').value=$('#'+id+' td:nth-child(8)').text();
+				$('#'+id+' td:nth-child(8)').attr("disabled","disabled");
 			},
 			error : function(data) {
 				alert("Error!!!");
@@ -109,7 +110,7 @@ background-color:#cc0000;
 <li><a href="index.html">培训流程管理</a></li>
 <li><a href="students.html">学员管理</a></li>
 <li><a href="score.html">成绩管理</a></li>
-<li><a href="#about">About</a></li>
+<li><a href="forum.html">问题反馈</a></li>
 </ul>
 	<div id="dv"></div>
 </body>
