@@ -2,8 +2,10 @@
 /* CSS Document */
 /***
  */
-*{font-size:9pt;border:0;margin:0;padding:0;}
-body{font-family:'微软雅黑'; margin:0 auto;min-width:980px;}
+*{font-size:9pt;border:0;margin:0;padding:0;list-style-type:none;}
+body{background-color:#fff;font-size:18px;font-family:"Arial","Tahoma","微软雅黑","雅黑";line-height:18px;padding:0px;margin:0px;text-align:center;}
+a{display:block;float:left;}del,div.clear{height:0px;font-size:0px;line-height:0px;padding:0px;margin:0px;display:block;clear:both;overflow:hidden;}
+div{width:875px;text-align:left;margin:auto auto auto auto;}
 ul{display:block;margin:0;padding:0;list-style:none;}
 li{display:block;margin:0;padding:0;list-style: none;}
 img{border:0;}
@@ -13,6 +15,12 @@ a:hover{color:#00a4ac;text-decoration:none;}
 table{border-collapse:collapse;border-spacing: 0;}
 cite{font-style:normal;}
 h2{font-weight:normal;}
+
+/*menu*/
+
+.menu{line-height:18px;font-size:18px;width:875px;height:56px;background:url("../images/bg8_bg.jpg") no-repeat left top;margin-bottom:30px;}
+.menu a:link,.menu a:visited{height:46px;width:114px;color:#FFF;background:url("../images/bg8_btn.jpg") no-repeat left top;text-decoration:none;text-align:center;margin-right:2px;padding-top:10px;}
+.menu a:hover,.menu a:active{background-position:left -56px;}
 
 /*cloud*/
 

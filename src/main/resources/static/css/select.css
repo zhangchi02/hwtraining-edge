@@ -9,7 +9,7 @@
 .uew-select select{z-index:2;position:absolute;top:3px;_top:6px;cursor:pointer; height:28px;}
 /***** 去除聚焦虚线框 *****/
 a:focus,input[type=checkbox]:focus,input[type=radio]:focus,button:focus,select{outline:none;}
-select{opacity:0;filter:alpha(opacity=0);}
+/* select{opacity:0;filter:alpha(opacity=0);} */
 option{overflow:auto;}
 
 /*----------------------------------*

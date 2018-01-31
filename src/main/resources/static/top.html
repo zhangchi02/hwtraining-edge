@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<script>
+	var date = new Date();
+	var year = date.getFullYear();
+	var mont = date.getMonth()+1;
+	if(mont < 10){
+		mont = "0" + mont;
+	}
+	var classId = year + "" + mont;
+	$("#"+classId).attr("selected","selected");
+	function selectOpt(){
+	    var ads = self.parent.frames['rightFrame'].address;
+		classId = $("#classId").find("option:selected").val();
+		/* window.frames[1].contentWindow.location.reload(); */
+		/* if(ads=="index.html"){ */
+		self.parent.frames['rightFrame'].refreshTable();
+		/* } */
+	}
+</script>
+</head>
+
+<body>
+	<div>
+		<img src="images/logo.jpg" style="margin: 0 auto;" alt="wenqi blog" />
+	</div>
+	<div class="menu">
+		<a href="index.html" target="rightFrame">培训流程管理</a>
+		<a href="students.html" target="rightFrame">学员管理</a>
+		<a href="score.html" target="rightFrame">成绩管理</a>
+		<a href="forum.html" target="rightFrame">问题反馈</a>
+		<div class="vocation">
+			班次：<select id="classId" onchange="selectOpt()">
+				<option id="201802" value="201802">201802</option>
+				<option id="201801" value="201801">201801</option>
+				<option id="201803" value="201803">201803</option>
+				<option id="201804" value="201804">201804</option>
+				<option id="201805" value="201805">201805</option>
+				<option id="201806" value="201806">201806</option>
+				<option id="201807" value="201807">201807</option>
+				<option id="201808" value="201808">201808</option>
+				<option id="201809" value="201809">201809</option>
+				<option id="201810" value="201810">201810</option>
+				<option id="201811" value="201811">201811</option>
+				<option id="201812" value="201812">201812</option>
+			</select>
+		</div>
+	</div>
+</body>
+</html>
