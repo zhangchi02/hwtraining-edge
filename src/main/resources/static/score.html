@@ -4,95 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>成绩管理</title>
 <link href="css/style.css" rel="stylesheet" type="text/css" />
-<style>
-ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-}
-
-li {
-	float: left;
-}
-
-a:link, a:visited {
-	display: block;
-	width: 120px;
-	font-weight: bold;
-	color: #FFFFFF;
-	background-color: #bebebe;
-	text-align: center;
-	padding: 4px;
-	text-decoration: none;
-	text-transform: uppercase;
-}
-
-a:hover, a:active {
-	background-color: #cc0000;
-}
-</style>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript">
+	var cid = self.parent.frames['topFrame'].classId;
 	url = "hwtraining-teacher-service/hwtraining/v1/studentscore";
 	$(document)
 			.ready(
 					function() {
-						$
-								.ajax({
-									type : "GET",
-									url : url,
-									dataType : "json",
-									cache : false,
-									sync : false,
-									data : {
-										classId : "201801"
-									},
-									success : function(data) {
-										var s = '<table  class="tablelist" ><tr><th>班次</th><th>姓名</th><th>遗留应用</th><th>中间件</th><th>容器</th><th>微服务</th><th>航空订票</th><th>车联网</th><th>银行理财</th><th>EI视觉</th><th>签到</th><th>总分</th></tr>';
-										var jsonReturn = eval(data);
-										for (var i = 0; i < jsonReturn.length; i++) {
-											total = parseInt(jsonReturn[i].subject1)+parseInt(jsonReturn[i].subject2)+parseInt(jsonReturn[i].subject3)+parseInt(jsonReturn[i].subject4)
-													+parseInt(jsonReturn[i].subject5)+parseInt(jsonReturn[i].subject6)+parseInt(jsonReturn[i].subject7)+parseInt(jsonReturn[i].subject8)
-													+parseInt(jsonReturn[i].subject9);
-											var color="background-color:blue";
-											if(total<100){
-												color="background-color:red";
-											}else{
-												color="background-color:blue";												
-											}
-											s += '<tr><td >'
-													+ jsonReturn[i].classId
-													+ '</td><td>'
-													+ jsonReturn[i].name
-													+ '</td><td  ondblclick="changeStatus(this)" ><input  type="text" value="'
-													+ jsonReturn[i].subject1
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject2
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject3
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject4
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject5
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject6
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject7
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject8
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
-													+ jsonReturn[i].subject9
-													+ '"  onblur="modifyScore(this)" disabled="" /></td><td> <input type="text" style="'+color+'" disabled="disabled" value="'+total+'"/></td></tr>';
-													
-										}
-										s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
-										$('#dv').html(s);
-									},
-									error : function(data) {
-										alert("Error!!!");
-									}
-								});
+					initTable();	
 					});
 	function modifyScore(id) {
 		var tr = $(id).parent().parent().children();
@@ -154,15 +73,67 @@ a:hover, a:active {
 		$(id).children("input").attr("disabled", false);
 		$(id).children("input").focus();
 	}
+	function initTable(){
+		cid = self.parent.frames['topFrame'].classId;
+		$.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			cache : false,
+			sync : false,
+			data : {
+				classId : cid
+			},
+			success : function(data) {
+				var s = '<table  class="tablelist" ><tr><th>班次</th><th>姓名</th><th>遗留应用</th><th>中间件</th><th>容器</th><th>微服务</th><th>航空订票</th><th>车联网</th><th>银行理财</th><th>EI视觉</th><th>签到</th><th>总分</th></tr>';
+				var jsonReturn = eval(data);
+				for (var i = 0; i < jsonReturn.length; i++) {
+					total = parseInt(jsonReturn[i].subject1)+parseInt(jsonReturn[i].subject2)+parseInt(jsonReturn[i].subject3)+parseInt(jsonReturn[i].subject4)
+							+parseInt(jsonReturn[i].subject5)+parseInt(jsonReturn[i].subject6)+parseInt(jsonReturn[i].subject7)+parseInt(jsonReturn[i].subject8)
+							+parseInt(jsonReturn[i].subject9);
+					var color="background-color:blue";
+					if(total<100){
+						color="background-color:red";
+					}else{
+						color="background-color:blue";												
+					}
+					s += '<tr><td >'
+							+ jsonReturn[i].classId
+							+ '</td><td>'
+							+ jsonReturn[i].name
+							+ '</td><td  ondblclick="changeStatus(this)" ><input  type="text" value="'
+							+ jsonReturn[i].subject1
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject2
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject3
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject4
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject5
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject6
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject7
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject8
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeStatus(this)"><input type="text" value="'
+							+ jsonReturn[i].subject9
+							+ '"  onblur="modifyScore(this)" disabled="" /></td><td> <input type="text" style="'+color+'" disabled="disabled" value="'+total+'"/></td></tr>';
+							
+				}
+				s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+				$('#dv').html(s);
+			},
+			error : function(data) {
+				alert("Error!!!");
+			}
+		});
+	}
+	var refreshTable= initTable;
 </script>
 </head>
 <body>
-	<ul>
-		<li><a href="index.html">培训流程管理</a></li>
-		<li><a href="students.html">学员管理</a></li>
-		<li><a href="score.html">成绩管理</a></li>
-		<li><a href="#about">About</a></li>
-	</ul>
 	<div id="dv"></div>
 </body>
 

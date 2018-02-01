@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>问题反馈</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<link href="css/select.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.idTabs.min.js"></script>
+<script type="text/javascript" src="js/select-ui.min.js"></script>
+<script type="text/javascript" src="editor/kindeditor.js"></script>
+<script type="text/javascript" src="js/jquery-form.js"></script>
+
+<script type="text/javascript">
+	var cid = self.parent.frames['topFrame'].classId;
+	var t = new Date(); 
+	var y = t.getFullYear();
+	var m = t.getMonth()+1;
+	if(m<10){
+		m = "0"+m;
+	}
+	var date = y+""+m;
+	$("#"+date).attr("selected","selected");
+	url = "hwtraining-teacher-service/hwtraining/v1/forumcontent";
+	$(document)
+			.ready(
+					function() {
+					initTable();
+					});
+	function initTable(){
+		cid = self.parent.frames['topFrame'].classId;
+		$.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {
+				classId : cid
+			},
+			success : function(data) {
+				var s = '<ul id="pn">';
+				var jsonReturn = eval(data);
+				for (var i = 0; i < jsonReturn.length; i++) {
+					s += '<li id="'+i+'" class="list0"><a class="close" href="javascript:;">X</a>'
+							+ '<div class="head"><span class="name">'
+							+ jsonReturn[i].classId
+							+ '</span><span class="name">'
+							+ jsonReturn[i].tenant
+							+ '</span></div><div class="content"><p class="text"><span class="name">'
+							+ jsonReturn[i].name
+							+ '</span>'
+							+ jsonReturn[i].content
+							+ '</p><div class="pic"><image src="'
+							+ jsonReturn[i].path+ '" alt=""/></div><div class="good"><span class="date">'
+							+ jsonReturn[i].time
+							+ '</span></div>';
+				}
+				s += '</li></ul><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+				$('#problems').html(s);
+			},
+			error : function(data) {
+				alert("Error!!!");
+			}
+		});
+	}
+	var refreshTable= initTable;
+	function uploadPic() {
+		// 上传设置  
+		var options = {
+			url : "hwtraining-teacher-service/hwtraining/v1/upload",
+			type : "POST",
+			/* contentType : "text/plain", */
+			dataType : "text",
+			success : function(data) {
+				console.log(data);
+				$("#allUrl").attr("src", data);
+			},
+			error : function(data) {
+				alert("上传图片失败！！！");
+				console.log(data);
+				return;
+			}
+		};
+
+		$("#uploadForm").ajaxSubmit(options);
+	}
+	function upload() {
+		var name = $("#name").val();
+		var tenant = $("#tenant").val();
+		var content = $("#content").val();
+		var path = $("#allUrl").attr("src");
+		$.ajax({
+			url : "hwtraining-teacher-service/hwtraining/v1/forumcontent",
+			type : "POST",
+			contentType : "application/json",
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : JSON.stringify({
+				classId : "201801",
+				name : name,
+				tenant : tenant,
+				time : "2018-01-30 15:36:45",
+				content : content,
+				path : path
+			}),
+			success : function(data) {
+				console.log(data);
+				window.location.reload();
+			},
+			error : function(data) {
+				alert("保存失败!!!");
+				console.log(data);
+			}
+		});
+	}
+	function queryProblems(){
+		var classId = $("#classId").find("option:selected").val();
+		$.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {
+				classId : classId
+			},
+			success : function(data) {
+				var s = '<ul id="pn">';
+				var jsonReturn = eval(data);
+				for (var i = 0; i < jsonReturn.length; i++) {
+					s += '<li id="'+i+'" class="list0"><a class="close" href="javascript:;">X</a>'
+							+ '<div class="head"><span class="name">'
+							+ jsonReturn[i].classId
+							+ '</span><span class="name">'
+							+ jsonReturn[i].tenant
+							+ '</span></div><div class="content"><p class="text"><span class="name">'
+							+ jsonReturn[i].name
+							+ '</span>'
+							+ jsonReturn[i].content
+							+ '</p><div class="pic"><image src="'
+							+ jsonReturn[i].path+ '" alt=""/></div><div class="good"><span class="date">'
+							+ jsonReturn[i].time
+							+ '</span></div>';
+				}
+				s += '</li></ul><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+				$('#problems').html(s);
+			},
+			error : function(data) {
+				alert("Error!!!");
+			}
+		});
+	}
+</script>
+<style>
+#pn {
+	width: 550px;
+	height: auto;
+	background: #fff;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.list0 {
+	padding: 20px 0;
+	position: relative;
+	border-top: 1px solid #eee;
+}
+
+.head {
+	width: 60px;
+	float: left;
+}
+
+.head img {
+	width: 60px;
+	height: 60px;
+}
+
+.close {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: #696e78;
+	font-size: 14px;
+	text-align: center;
+	line-height: 20px;
+}
+
+.close:hover {
+	color: #eb7350;
+}
+
+.content {
+	width: 450px;
+	line-height: 20px;
+	font-size: 14px;
+	margin-left: 70px;
+}
+
+.name {
+	color: #eb7350;
+}
+
+.pic {
+	margin: 5px 0;
+}
+
+.good a {
+	float: right;
+	color: #808080;
+}
+
+.people {
+	background: #F7F7F7;
+	height: 28px;
+	line-height: 28px;
+	padding-left: 10px;
+	margin: 5px 0;
+}
+
+.date {
+	float: left;
+	color: #808080;
+}
+
+ul.menu {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+li.menu {
+	float: left;
+}
+
+a:link.menu, a:visited.menu {
+	display: block;
+	width: 120px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #bebebe;
+	text-align: center;
+	padding: 4px;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+a:hover.menu, a:active.menu {
+	background-color: #cc0000;
+}
+</style>
+</head>
+
+<body>
+	<div>
+		<div>
+			<div>
+				<span>姓名：</span> <input id="name" type="text" name="name" />
+			</div>
+			<div>
+				<span>服务：</span> <input id="tenant" type="text" name="tenant" />
+			</div>
+			<div>
+				<span>问题描述：</span>
+				<textarea id="content" name="content" rows="3" cols="20"></textarea>
+			</div>
+		</div>
+		<div>
+			<form action="" method="post" id="uploadForm" enctype="multipart/form-data">
+				<table border="1" cellspacing="0" cellpadding="0">
+					<tr>
+						<td>
+							<div>
+								<span>上传照片</span>
+							</div>
+						</td>
+						<td>
+							<img width="100" height="100" id="allUrl" src="images/sample.jpg"/>
+						 	<input type="file" id="pic" name="file" onchange="uploadPic()" /> 
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<input type="button" value="提交" onclick="upload()" />
+	</div>
+
+	<div id="problems"></div>
+
+</body>
+
+</html>
