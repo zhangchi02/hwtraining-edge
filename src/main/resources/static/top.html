@@ -14,8 +14,9 @@
 	var classId = year + "" + mont;
 	$("#"+classId).attr("selected","selected");
 	function selectOpt(){
-	    var ads = self.parent.frames['rightFrame'].address;
+	    //var ads = self.parent.frames['rightFrame'].address;
 		classId = $("#classId").find("option:selected").val();
+		console.log("top selectOpt:",classId);
 		/* window.frames[1].contentWindow.location.reload(); */
 		/* if(ads=="index.html"){ */
 		self.parent.frames['rightFrame'].refreshTable();

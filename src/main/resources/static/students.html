@@ -8,6 +8,7 @@
 <script type="text/javascript">
 	var cid = self.parent.frames['topFrame'].classId;
 	url = "hwtraining-teacher-service/hwtraining/v1/students";
+	console.log("student init:",cid);
 	$(document)
 			.ready(
 					function() {
@@ -21,10 +22,13 @@
 					    });
 					    $(".tiptop a").click(function(){
 					        $(".tip").fadeOut(200);
+					        $(".tipDelete").fadeOut(200);
 					    });
 
 					    $("#sureAdd").click(function(){
 					  	    $("#tipAdd").fadeOut(100);
+					  	  	cid = self.parent.frames['topFrame'].classId;
+					  	  	console.log("student add:",cid);
 					  	    var companyName=$("#companyName").val();
 					  	    var name=$("#name").val();
 					  	    var title=$("#title").val();
@@ -40,7 +44,7 @@
 								cache : false,
 								async : false,
 								data : JSON.stringify({
-									"classId": "201801",
+									"classId": cid,
 									"companyName": companyName,
 									"name": name,
 									"title": title,
@@ -50,9 +54,8 @@
 									"comment": comment
 								}),
 								success : function(data) {
-									alert(data);
 									if(data == true){
-										window.location.reload();
+										initTable();
 									}else{
 										alert("false!!!");
 										return;
@@ -66,6 +69,8 @@
 					    });
 					    $("#sureDelete").click(function(){
 					    	$("#tipDelete").fadeOut(100);
+					    	cid = self.parent.frames['topFrame'].classId;
+					    	console.log("student delete:",cid);
 					    	obj = document.getElementsByName("student");
 						    check_val = [];
 						    for(k in obj){
@@ -86,12 +91,12 @@
 									cache : false,
 									async : false,
 									data : {
-										classId: classId,
+										classId: cid,
 										name: name,
 										phoneNumber: phoneNumber
 									},
 									success : function(data) {
-										alert("success");
+										initTable();
 									},
 									error : function(data) {
 										alert("Error!!!");
@@ -99,14 +104,15 @@
 									}
 								});
 						    }
-						    window.location.reload();
 					    });
 					    $(".cancel").click(function(){
 					        $(".tip").fadeOut(100);
+					        $(".tipDelete").fadeOut(100);
 					    });
 					});
 	function initTable(){
 		cid = self.parent.frames['topFrame'].classId;
+		console.log("student initTable:",cid);
 		$.ajax({
 			type : "GET",
 			url : url,
@@ -134,24 +140,14 @@
 </head>
 <body>
 	<div class="tools">
-
-			<ul class="toolbar">
-				<li class="click" id="clickAdd"><span><img src="images/t01.png" /></span>添加</li>
-				<li class="click"><span><img src="images/t02.png" /></span>修改</li>
-				<li class="click" id="clickDelete"><span><img src="images/t03.png" /></span>删除</li>
-				<li><span><img src="images/t04.png" /></span>统计</li>
-			</ul>
-
-
-			<ul class="toolbar1">
-				<li><span><img src="images/t05.png" /></span>设置</li>
-			</ul>
-
-		</div>
-				<!-- <div id="calend" class="calend">选择日期</div> -->
+		<ul class="toolbar">
+			<li class="click" id="clickAdd"><span><img src="images/t01.png" /></span>添加</li>
+			<li class="click" id="clickDelete"><span><img src="images/t03.png" /></span>删除</li>
+		</ul>
+	</div>
 	
 	<div class="tip" id="tipAdd">
-			<div class="tiptop">
+			<div class="tiptop" style="width:785px;">
 				<span>信息</span><a></a>
 			</div>
 
@@ -177,8 +173,8 @@
 			</div>
 
 		</div>
-		<div class="tip" id="tipDelete" >
-			<div class="tiptop">
+		<div class="tipDelete" id="tipDelete" >
+			<div class="tiptop" style="width:385px;">
 				<span>信息</span><a></a>
 			</div>
 
