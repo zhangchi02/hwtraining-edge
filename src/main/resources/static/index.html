@@ -7,15 +7,14 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript">
 	var cid = self.parent.frames['topFrame'].classId;
-	console.log("1",cid);
+	console.log("index init:",cid);
 	var url = "hwtraining-teacher-service/hwtraining/v1/tasks";
-	var address="index.html";
 	$(document).ready(function() {
 		initTable();
 	});
 	function initTable(){
 		cid = self.parent.frames['topFrame'].classId;
-		console.log(cid);
+		console.log("index initTable:",cid);
 		$.ajax({
 			type : "GET",
 			url : url,
