@@ -390,3 +390,103 @@ cursor: pointer;
 .basic-grey .button:hover {
 background: #CF7A7A
 }
+
+#pn {
+	width: 870px;
+	height: auto;
+	background: #fff;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.list0 {
+	padding: 20px 0;
+	position: relative;
+	border-top: 1px solid #eee;
+}
+
+.head {
+	width: 150px;
+	float: left;
+}
+
+.head img {
+	width: 100px;
+	height: 60px;
+}
+
+.close {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: #696e78;
+	font-size: 14px;
+	text-align: center;
+	line-height: 20px;
+}
+
+.close:hover {
+	color: #eb7350;
+}
+
+.content {
+	width: 720px;
+	line-height: 20px;
+	font-size: 14px;
+	margin-left: 70px;
+}
+
+.name {
+	color: #eb7350;
+}
+
+.pic {
+	margin: 5px 0;
+}
+
+.good a {
+	float: right;
+	color: #808080;
+}
+
+.people {
+	background: #F7F7F7;
+	height: 28px;
+	line-height: 28px;
+	padding-left: 10px;
+	margin: 5px 0;
+}
+
+.date {
+	float: left;
+	color: #808080;
+}
+
+ul.menu {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+li.menu {
+	float: left;
+}
+
+a:link.menu, a:visited.menu {
+	display: block;
+	width: 120px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #bebebe;
+	text-align: center;
+	padding: 4px;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+a:hover.menu, a:active.menu {
+	background-color: #cc0000;
+}
