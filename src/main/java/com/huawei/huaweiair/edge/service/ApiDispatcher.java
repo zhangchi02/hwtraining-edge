@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.huawei.huaweiair.edge.service.auth.User;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -125,8 +126,9 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		if (path.equals(LOGOUT_PATH)) {
 			logout(context);
 		}
-
-		if (path.contains("/hwtraining/v1/forumcontent") || path.startsWith("/hwtraining/v1/studentscore")) {
+		HttpMethod httpMethod=context.request().method();
+		System.out.println(httpMethod.toString());
+		if (path.contains("/hwtraining/v1/forumcontent") || (path.startsWith("/hwtraining/v1/studentscore")&&httpMethod.name().equals(httpMethod.GET.name()))) {
 
 		} else {
 
