@@ -41,7 +41,7 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiDispatcher.class);
 	private static final String LOGIN_USER = "hwtraining.login_user";
 	private static final String LOGIN_PATH = "/hwtraining/v1/login";
-	private static final String SESSIONID_COOKIE_NAME = "sessionid";
+	private static final String SESSIONID_COOKIE_NAME = "sessionID";
 	private static final Map<String, String> users = new HashMap<>();
 	private static final Map<String, String> sessions = new HashMap<>();
 	static {
@@ -81,7 +81,7 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 			context.response().end();
 		} else {
 			String sessionID = sessions.get(user.getUserName());
-			context.addCookie(Cookie.cookie("sessionID", sessionID));
+			context.addCookie(Cookie.cookie(SESSIONID_COOKIE_NAME, sessionID));
 			context.response().setStatusCode(200);
 			context.response().headers().add("Content-Type", "application/json");
 			context.response().headers().add("Content-Length", "" + "logged in succcess".length());
