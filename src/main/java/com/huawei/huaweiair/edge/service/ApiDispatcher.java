@@ -85,6 +85,7 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 			String sessionID = sessions.get(user.getUserName());
 			context.addCookie(Cookie.cookie(SESSIONID_COOKIE_NAME, sessionID));
 			context.response().setStatusCode(200);
+			context.response().headers().add("loggedinuser", user.getUserName());
 			context.response().headers().add("Content-Type", "application/json");
 			context.response().headers().add("Content-Length", "" + "logged in succcess".length());
 			context.response().write(Buffer.buffer("logged in succcess"));
