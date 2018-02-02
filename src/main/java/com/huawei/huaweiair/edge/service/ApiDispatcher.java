@@ -17,7 +17,6 @@
 
 package com.huawei.huaweiair.edge.service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -26,18 +25,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.servicecomb.edge.core.AbstractEdgeDispatcher;
 import org.apache.servicecomb.edge.core.EdgeInvocation;
-import org.apache.servicecomb.provider.springmvc.reference.RestTemplateBuilder;
-import org.apache.servicecomb.swagger.invocation.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
 
-import com.acmeair.entities.TokenInfo;
-import com.acmeair.web.dto.CustomerSession;
-import com.acmeair.web.dto.CustomerSessionInfo;
+import com.huawei.huaweiair.edge.service.auth.User;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.Cookie;
@@ -48,16 +39,23 @@ import io.vertx.ext.web.handler.CookieHandler;
 public class ApiDispatcher extends AbstractEdgeDispatcher {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiDispatcher.class);
-	private static HashMap<String, String> microserviceNameMap = new HashMap<>();
-	private static final String LOGIN_USER = "acmeair.login_user";
-	private static final String LOGIN_PATH = "/api/login";
-	private static final String LOGOUT_PATH = "/api/login/logout";
-	private static final String LOADDB_PATH = "/api/loaddb";
-	private static final String CONFIG_PATH = "/info/config/";
-	private static final String LOADER_PATH = "/info/loader/";
-	private static final String STUDENT_PATH = "/hwtraining/v1/";
+	private static final String LOGIN_USER = "hwtraining.login_user";
+	private static final String LOGIN_PATH = "/hwtraining/v1/login";
 	private static final String SESSIONID_COOKIE_NAME = "sessionid";
-	private RestTemplate restTemplate = RestTemplateBuilder.create();
+	private static final Map<String, String> users = new HashMap<>();
+	private static final Map<String, String> sessions = new HashMap<>();
+	static {
+		users.put("admin", "2018");
+		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac01");
+		users.put("zhangchi", "201801");
+		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac02");
+		users.put("tank", "201802");
+		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac03");
+		users.put("liushanshan", "201803");
+		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac04");
+		users.put("default", "huaweicool");
+		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac05");
+	}
 
 	@Override
 	public int getOrder() {
@@ -72,59 +70,72 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		router.routeWithRegex(regex).failureHandler(this::onFailure).handler(this::onRequest);
 	}
 
+	private void login(RoutingContext context) {
+		User user = context.getBodyAsJson().mapTo(User.class);
+		String password = users.get(user.getUserName());
+		if (null == password || password.isEmpty() || !password.equals(user.getPassword())) {
+			context.response().setStatusCode(HttpServletResponse.SC_FORBIDDEN);
+			context.response().headers().add("Content-Type", "application/json");
+			context.response().headers().add("Content-Length", "" + "illegal user".length());
+			context.response().write(Buffer.buffer("illegal user"));
+			context.response().end();
+		} else {
+			String sessionID = sessions.get(user.getUserName());
+			context.addCookie(Cookie.cookie("sessionID", sessionID));
+			context.response().setStatusCode(200);
+			context.response().headers().add("Content-Type", "application/json");
+			context.response().headers().add("Content-Length", "" + "logged in succcess".length());
+			context.response().write(Buffer.buffer("logged in succcess"));
+			context.response().end();
+		}
+	}
+	private String validateCustomerSession(String sessionId) {
+		if (null == sessionId || sessionId.isEmpty()) {
+			return null;
+		}
+		for(Object obj : sessions.keySet()) {
+	        String tempUserName = (String) obj;
+	        String tempSessionID = (String) sessions.get(tempUserName);
+	        if(sessionId.equals(tempSessionID))
+	        {
+	        	return tempUserName;
+	        }
+	    }
+		return null;
+	}
+
 	protected void onRequest(RoutingContext context) {
 
 		Map<String, String> pathParams = context.pathParams();
-		String microserviceName =pathParams.get("param0");
-		String path ="/hwtraining"+"/" + pathParams.get("param1");
-		if (path.endsWith(LOGIN_PATH)) {
-			EdgeInvocation edgeInvocation = new EdgeInvocation() {
-				protected void sendResponse(Response response) throws Exception {
-					if (response.isSuccessed() && (response.getResult() != null)) {
-						TokenInfo tokenInfo = (TokenInfo) response.getResult();
-						Cookie cookie = Cookie.cookie("sessionid", tokenInfo.getSessionid());
-						cookie.setPath("/");
-						context.addCookie(cookie);
-						context.response().headers().add("Content-Type", "application/json");
-						context.response().headers().add("Content-Length", "" + "logged in".length());
-						context.response().write(Buffer.buffer("logged in"));
-						context.response().end();
-						LOGGER.info("user login seccuessfully");
-					}
-
-				}
-			};
-			edgeInvocation.init(microserviceName, context, path, httpServerFilters);
-			edgeInvocation.edgeInvoke();
-			return;
-
+		String microserviceName = pathParams.get("param0");
+		String path = "/hwtraining" + "/" + pathParams.get("param1");
+		if (path.equals(LOGIN_PATH)) {
+			login(context);
 		}
 
-		if (path.endsWith(LOGOUT_PATH) || path.endsWith(LOADDB_PATH) || path.contains(CONFIG_PATH)
-				|| path.contains(LOADER_PATH)||path.startsWith("/hwtraining/v1/")) {
+		if (path.contains("/hwtraining/v1/forumcontent") || path.startsWith("/hwtraining/v1/studentscore")) {
 
 		} else {
 
 			Set<Cookie> cookies = context.cookies();
-			CustomerSession customerSession = null;
+			String loginUserName = null;
 			if (null != cookies && !cookies.isEmpty()) {
 				for (Cookie cookie : cookies) {
 					if (cookie.getName().equals(SESSIONID_COOKIE_NAME) && null != cookie.getValue()) {
-						customerSession = validateCustomerSession(cookie.getValue().trim());
+						loginUserName = validateCustomerSession(cookie.getValue().trim());
 						break;
 					}
 				}
 			}
 
-			if (null == customerSession) {
+			if (null == loginUserName||loginUserName.isEmpty()) {
 				LOGGER.info("unauthenticated user.");
 				context.response().setStatusCode(HttpServletResponse.SC_FORBIDDEN);
 				context.response().end();
 				return;
 			} else {
-				context.request().headers().add(LOGIN_USER, customerSession.getCustomerid());
-				LOGGER.info("Customer {} validated with session id {}", customerSession.getCustomerid(),
-						customerSession.getId());
+				context.request().headers().add(LOGIN_USER,loginUserName);
+				LOGGER.info("Customer {} validated success.", loginUserName);
 
 			}
 		}
@@ -133,27 +144,6 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		edgeInvocation.init(microserviceName, context, path, httpServerFilters);
 		edgeInvocation.edgeInvoke();
 
-	}
-
-	public CustomerSession validateCustomerSession(String sessionId) {
-		if (null == sessionId || sessionId.isEmpty()) {
-			return null;
-		}
-		ResponseEntity<CustomerSessionInfo> responseEntity = restTemplate.postForEntity(
-				"cse://customerServiceApp" + "/api/login/validate", validationRequest(sessionId),
-				CustomerSessionInfo.class);
-
-		if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-			LOGGER.warn("No such customer found with session id {}", sessionId);
-			return null;
-		}
-		return responseEntity.getBody();
-	}
-
-	protected Object validationRequest(String sessionId) {
-		Map<String, String> map = new HashMap<>();
-		map.put("sessionId", sessionId);
-		return map;
 	}
 
 }
