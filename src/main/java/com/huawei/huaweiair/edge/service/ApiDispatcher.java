@@ -41,6 +41,7 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiDispatcher.class);
 	private static final String LOGIN_USER = "hwtraining.login_user";
 	private static final String LOGIN_PATH = "/hwtraining/v1/login";
+	private static final String LOGOUT_PATH = "/hwtraining/v1/logout";
 	private static final String SESSIONID_COOKIE_NAME = "sessionID";
 	private static final Map<String, String> users = new HashMap<>();
 	private static final Map<String, String> sessions = new HashMap<>();
@@ -89,6 +90,15 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 			context.response().end();
 		}
 	}
+	
+	private void logout(RoutingContext context) {
+			context.removeCookie(SESSIONID_COOKIE_NAME);
+			context.response().setStatusCode(200);
+			context.response().headers().add("Content-Type", "application/json");
+			context.response().headers().add("Content-Length", "" + "logout succcess".length());
+			context.response().write(Buffer.buffer("logout succcess"));
+			context.response().end();
+	}
 	private String validateCustomerSession(String sessionId) {
 		if (null == sessionId || sessionId.isEmpty()) {
 			return null;
@@ -111,6 +121,9 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		String path = "/hwtraining" + "/" + pathParams.get("param1");
 		if (path.equals(LOGIN_PATH)) {
 			login(context);
+		}
+		if (path.equals(LOGOUT_PATH)) {
+			logout(context);
 		}
 
 		if (path.contains("/hwtraining/v1/forumcontent") || path.startsWith("/hwtraining/v1/studentscore")) {
