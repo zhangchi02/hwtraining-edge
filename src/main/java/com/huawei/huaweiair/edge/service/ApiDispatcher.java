@@ -18,8 +18,12 @@
 package com.huawei.huaweiair.edge.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +31,7 @@ import org.apache.servicecomb.edge.core.AbstractEdgeDispatcher;
 import org.apache.servicecomb.edge.core.EdgeInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 import com.huawei.huaweiair.edge.service.auth.User;
 
@@ -36,7 +41,9 @@ import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CookieHandler;
+import net.sf.json.JSONArray;
 
+@SuppressWarnings("unchecked")
 public class ApiDispatcher extends AbstractEdgeDispatcher {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApiDispatcher.class);
@@ -44,19 +51,39 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 	private static final String LOGIN_PATH = "/hwtraining/v1/login";
 	private static final String LOGOUT_PATH = "/hwtraining/v1/logout";
 	private static final String SESSIONID_COOKIE_NAME = "sessionID";
-	private static final Map<String, String> users = new HashMap<>();
-	private static final Map<String, String> sessions = new HashMap<>();
+	private static List<User> usersList;
+	private static final Map<String, User> usersMap = new HashMap<String, User>();
+	private static RestTemplate restTemplate = new RestTemplate();
+	private static Timer timer = new Timer();
+
 	static {
-		users.put("admin", "2018");
-		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac01");
-		users.put("zhangchi", "201801");
-		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac02");
-		users.put("tank", "201802");
-		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac03");
-		users.put("liushanshan", "201803");
-		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac04");
-		users.put("default", "huaweicool");
-		sessions.put("admin", "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac05");
+		timer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				try {
+					String userinfo = restTemplate
+							.getForObject("https://hwtraining.obs.myhwclouds.com/tankuse/users.json", String.class);
+					usersList = (List<User>) JSONArray.toCollection(JSONArray.fromObject(userinfo), User.class);
+				} catch (Exception e) {
+					LOGGER.error("get user info error: ", e);
+				}
+				if (null == usersList || usersList.isEmpty()) {
+					usersList = new LinkedList<>();
+					String sessionID = "0a3a8841-5ec3-49d2-a9d2-4f5b5197ac01";
+					usersList.add(new User("admin", "2018", sessionID));
+					usersList.add(new User("tank", "201801", sessionID));
+					usersList.add(new User("zhangchi", "201802", sessionID));
+					usersList.add(new User("liushanshan", "201803", sessionID));
+					usersList.add(new User("test", "test1234", sessionID));
+				}
+				for (User user : usersList) {
+					usersMap.put(user.getUserName(), user);
+				}
+
+			}
+		}, 0, 5 * 60 * 1000);
+
 	}
 
 	@Override
@@ -74,16 +101,15 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 
 	private void login(RoutingContext context) {
 		User user = context.getBodyAsJson().mapTo(User.class);
-		String password = users.get(user.getUserName());
-		if (null == password || password.isEmpty() || !password.equals(user.getPassword())) {
+		User targetUser = usersMap.get(user.getUserName());
+		if (null == targetUser || !targetUser.getPassword().equals(user.getPassword())) {
 			context.response().setStatusCode(HttpServletResponse.SC_FORBIDDEN);
 			context.response().headers().add("Content-Type", "application/json");
 			context.response().headers().add("Content-Length", "" + "illegal user".length());
 			context.response().write(Buffer.buffer("illegal user"));
 			context.response().end();
 		} else {
-			String sessionID = sessions.get(user.getUserName());
-			context.addCookie(Cookie.cookie(SESSIONID_COOKIE_NAME, sessionID));
+			context.addCookie(Cookie.cookie(SESSIONID_COOKIE_NAME, targetUser.getSessionID()));
 			context.response().setStatusCode(200);
 			context.response().headers().add("loggedinuser", user.getUserName());
 			context.response().headers().add("Content-Type", "application/json");
@@ -92,27 +118,25 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 			context.response().end();
 		}
 	}
-	
+
 	private void logout(RoutingContext context) {
-			context.removeCookie(SESSIONID_COOKIE_NAME);
-			context.response().setStatusCode(200);
-			context.response().headers().add("Content-Type", "application/json");
-			context.response().headers().add("Content-Length", "" + "logout succcess".length());
-			context.response().write(Buffer.buffer("logout succcess"));
-			context.response().end();
+		context.removeCookie(SESSIONID_COOKIE_NAME);
+		context.response().setStatusCode(200);
+		context.response().headers().add("Content-Type", "application/json");
+		context.response().headers().add("Content-Length", "" + "logout succcess".length());
+		context.response().write(Buffer.buffer("logout succcess"));
+		context.response().end();
 	}
+
 	private String validateCustomerSession(String sessionId) {
 		if (null == sessionId || sessionId.isEmpty()) {
 			return null;
 		}
-		for(Object obj : sessions.keySet()) {
-	        String tempUserName = (String) obj;
-	        String tempSessionID = (String) sessions.get(tempUserName);
-	        if(sessionId.equals(tempSessionID))
-	        {
-	        	return tempUserName;
-	        }
-	    }
+		for (User user : usersList) {
+			if (sessionId.equals(user.getSessionID())) {
+				return user.getUserName();
+			}
+		}
 		return null;
 	}
 
@@ -127,9 +151,9 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		if (path.equals(LOGOUT_PATH)) {
 			logout(context);
 		}
-		HttpMethod httpMethod=context.request().method();
-		System.out.println(httpMethod.toString());
-		if (path.contains("/hwtraining/v1/forumcontent") || (path.startsWith("/hwtraining/v1/studentscore")&&httpMethod.name().equals(httpMethod.GET.name()))) {
+		HttpMethod httpMethod = context.request().method();
+		if (path.contains("/hwtraining/v1/forumcontent") || (path.startsWith("/hwtraining/v1/studentscore")
+				&& httpMethod.name().equals(HttpMethod.GET.name()))) {
 
 		} else {
 
@@ -144,13 +168,13 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 				}
 			}
 
-			if (null == loginUserName||loginUserName.isEmpty()) {
+			if (null == loginUserName || loginUserName.isEmpty()) {
 				LOGGER.info("unauthenticated user.");
 				context.response().setStatusCode(HttpServletResponse.SC_FORBIDDEN);
 				context.response().end();
 				return;
 			} else {
-				context.request().headers().add(LOGIN_USER,loginUserName);
+				context.request().headers().add(LOGIN_USER, loginUserName);
 				LOGGER.info("Customer {} validated success.", loginUserName);
 
 			}
