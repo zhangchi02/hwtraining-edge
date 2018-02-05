@@ -106,8 +106,20 @@
 		});
 	}
 	$(document).ready(function() {
-		$.session.set("loggedinuser", "");
-		isLogin();
+		var divs = document.getElementsByName("aaa");
+		var len = divs.length;
+		for(var i=0;i<len;i++){
+			divs[i].onclick = function(){
+				for(var j=0;j<len;j++){
+					divs[j].style = "";
+				}
+				this.style= "background-position:left -56px;";
+			};
+		}
+		//$.session.set("loggedinuser", "");
+		if(isLogin()){
+			$("#option").fadeIn(100);
+		}
 		notice();
 		$("#clickAdd").click(function() {
 			$("#tipAdd").fadeIn(200);
@@ -203,6 +215,8 @@
 	function notice() {
 		var s = '<p><b><red>华为PaaS高级培训第五期2018年3月中旬开班，现在启动报名，报名请联系各个合作伙伴对应华为接口人。</red></b></p>';
 		$('#dv').html(s);
+		$("#control").fadeOut(100);
+		$("#forum").fadeOut(100);
 
 	}
 	function studentShow() {
@@ -429,21 +443,22 @@
 						var jsonReturn = eval(data);
 						for (var i = 0; i < jsonReturn.length; i++) {
 							s += '<li id="'+i+'" class="list0">'
-									+ '<div class="head"><span class="name">班次：'
+									+ '<div class="left"><span class="name">班次：'
 									+ jsonReturn[i].classId
 									+ '</span><span class="name">产品：'
 									+ jsonReturn[i].tenant
 									+ '</span><span class="name">姓名：'
 									+ +jsonReturn[i].name
-									+ '</span></div><div class="content"><p class="text">'
+									+ '</span></div><div class="main"><div class="first"><p class="text">'
 									+ jsonReturn[i].content
-									+ '</p><div class="pic"><image src="'		
- 							+ jsonReturn[i].path+ '" alt=""/></div><div class="good"><span class="date">'
+									+ '</p></div><div class="second"><image width="100%" src="'		
+ 							+ jsonReturn[i].path+ '" alt=""/></div><div class="third"><span class="date">'
 									+ jsonReturn[i].time + '</span></div>';
 						}
 						s += '</li></ul><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
 						$('#dv').html(s);
 						$("#forum").fadeIn(100);
+						$("#control").fadeOut(100);
 					},
 					error : function(data) {
 						alert("查询问题失败！");
@@ -470,8 +485,8 @@
 	}
 	function upload() {
 		cid = classId;
-		var name = $("#forumusername").val();
-		var tenant = $("#tenant").val();
+		var name = $("#userId").val();
+		var tenant = $("#tenant").find("option:selected").val();
 		var content = $("#content").val();
 		var path = $("#allUrl").attr("src");
 		$.ajax({
@@ -515,7 +530,7 @@
 				password : password
 			}),
 			success : function(data) {
-				$.session.set('loggedinuser', username);
+				$.session.set('loggedinuser', username ,true);
 				$('#dv').html();
 				$("#dialog").fadeOut(100);
 				$("#option").fadeIn(100);
@@ -555,7 +570,7 @@
 	}
 
 	function isLogin() {
-		if ($.session.get("loggedinuser") == "") {
+		if ($.session.get("loggedinuser") == ""||typeof($.session.get("loggedinuser")) == "undefined") {
 			$("#logout").fadeOut(100);
 			$("#dialog").fadeIn(100);
 			return false;
@@ -565,31 +580,39 @@
 			return true;
 		}
 	}
-	
-	function getSessionId(){  
+	function getSessionId(){
         var c_name = 'JSESSIONID';  
         if(document.cookie.length>0){  
-           c_start=document.cookie.indexOf(c_name + "=")  
-           if(c_start!=-1){   
-             c_start=c_start + c_name.length+1   
-             c_end=document.cookie.indexOf(";",c_start)  
-             if(c_end==-1) c_end=document.cookie.length  
+           c_start=document.cookie.indexOf(c_name + "="); 
+           if(c_start!=-1){ 
+             c_start=c_start + c_name.length+1;
+             c_end=document.cookie.indexOf(";",c_start);  
+             if(c_end==-1) c_end=document.cookie.length;  
              return unescape(document.cookie.substring(c_start,c_end));  
-           }  
-        }  
-    }  
+           }else{
+                //手动从后台传来sessionid
+              var JSESSIONID = $('#JSESSIONID').val();
+              return JSESSIONID;
+           }
+        }
+    }
+	
 </script>
 </head>
 <body>
+	<div>
+		<img src="images/huaweilogo.jpg" style="margin: 0 auto;" alt="wenqi blog" />
+	</div>
 	<div class="menu">
-		<a href="javascript:notice();">华为云PaaS学堂公告</a> <a
-			href="javascript:taskShow();">培训流程管理</a> <a
-			href="javascript:studentShow();">学员报名管理</a> <a
-			href="javascript:scoreShow();">学员成绩管理</a> <a
-			href="javascript:forumShow();">产品问题管理</a>
+		<a name="aaa" href="javascript:notice();">华为云PaaS学堂公告</a>
+		<a name="aaa" href="javascript:taskShow();">培训流程管理</a>
+		<a name="aaa" href="javascript:studentShow();">学员报名管理</a>
+		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
+		<a name="aaa" href="javascript:forumShow();">产品问题管理</a>
 		<div id="option" class="vocation" style="display: none;">
-			班次：<select id="classId" onchange="selectOpt()">
-				<option id="201802" value="201802">201802</option>
+		         班次：
+		    <select id="classId" onchange="selectOpt()">
+		        <option id="201802" value="201802">201802</option>
 				<option id="201801" value="201801">201801</option>
 				<option id="201803" value="201803">201803</option>
 				<option id="201804" value="201804">201804</option>
@@ -601,26 +624,15 @@
 				<option id="201810" value="201810">201810</option>
 				<option id="201811" value="201811">201811</option>
 				<option id="201812" value="201812">201812</option>
-			</select>
+	        </select>
 		</div>
-	</div>
-	<div id="logout">
-		<a class="link" href="javascript:logout();">退出</a>
-	</div>
-	<div></div>
-	<div id="dialog">
-		<div>
-			<div>
-				<input id="username" class="ui-dialog-input" type="text"
-					placeholder="用户名" value="" />
-			</div>
-			<div>
-				<input id="password" class="ui-dialog-input" type="password"
-					placeholder="密码" value="" />
-			</div>
-			<div>
-				<a href="javascript:login();">登录</a>
-			</div>
+	    <div id="logout" class="logout">
+			<button onclick="logout()">退出</button>
+		</div>
+		<div id="dialog" class="logout">
+		    <input id="username" class="ui-dialog-input" type="text" placeholder="用户名" value="" />
+			<input id="password" class="ui-dialog-input" type="password" placeholder="密码" value="" />
+		    <button onclick="login()">登录</button>
 		</div>
 	</div>
 	<div id="control" class="tools" style="display: none;">
@@ -642,20 +654,34 @@
 			<div class="tipright">
 				<ul class="forminfo">
 					<!-- <li><label><b>* 请仔细核对学员信息，确认无误后提交。</b></label></li> -->
-					<li><label>公司名称<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="companyName" /></li>
-					<li><label>姓名<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="name" /></li>
-					<li><label>岗位<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="title" /></li>
-					<li><label>手机号<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="phoneNumber" /></li>
-					<li><label>邮箱<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="email" /></li>
-					<li><label>华为云账号<b>*</b></label><input type="text"
-						class="dfinput" style="width: 518px;" id="hwcloudId" /></li>
-					<li><label>备注</label><input type="text" class="dfinput"
-						style="width: 518px;" id="comment" /></li>
+					<li>
+					    <label>公司名称<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="companyName" />
+					</li>
+					<li>
+					    <label>姓名<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="name" />
+					</li>
+					<li>
+					    <label>岗位<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="title" />
+					</li>
+					<li>
+					    <label>手机号<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="phoneNumber" />
+					</li>
+					<li>
+					    <label>邮箱<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="email" />
+					</li>
+					<li>
+					    <label>华为云账号<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="hwcloudId" />
+					</li>
+					<li>
+					    <label>备注</label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="comment" />
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -684,40 +710,47 @@
 			<input name="" type="button" class="cancel" value="取消" />
 		</div>
 	</div>
-	<div>
-		<div>
-			<div id="forum" class="basic-grey" style="display: none;">
-				<h1>
-					Contact Form <span>Please fill all the texts in the fields.</span>
-				</h1>
-				<label> <span>姓 名 :</span> <input id="forumusername"
-					type="text" name="name" placeholder="" />
-				</label> <label> <span>产 品 :</span> <input id="tenant" type="text"
-					name="tenant" placeholder="" />
-				</label> <label> <span>问题描述 :</span> <textarea id="content"
-						name="content" placeholder="Your Message to Us"></textarea>
-				</label> <label> <span>上传照片</span>
-					<table>
-						<tr>
-							<td>
-								<form action="" method="post" id="uploadForm"
-									enctype="multipart/form-data">
-									<table border="1" cellspacing="0" cellpadding="0">
-										<tr>
-											<td><img width="100" height="100" id="allUrl"
-												src="images/sample.jpg" /> <input type="file" id="pic"
-												name="file" onchange="uploadPic()" /></td>
-										</tr>
-									</table>
-								</form>
-							</td>
-						</tr>
-					</table>
-				</label> <label> <span>&nbsp;</span> <input type="button"
-					class="button" onclick="upload()" value="提交" />
-				</label>
-			</div>
-		</div>
+	<div id="forum" class="basic-grey" style="display: none;">
+		<span>请如实反馈所遇到的问题</span>
+		<label>
+		    租户名:<input id="userId" type="text" name="userId" placeholder="" />
+	             姓 名 :<input id="forumusername" type="text" name="name" placeholder="" />
+		    产 品 :<select id="tenant" name="tenant" placeholder="" >
+			    <option value="中间件">中间件</option>
+			    <option value="CCE">CCE</option>
+			    <option value="CSE">CSE</option>
+			    <option value="软件开发云">软件开发云</option>
+			    <option value="DIS">DIS</option>
+			    <option value="MRS">MRS</option>
+			</select>
+		</label> 
+		<label>
+		    <span>问题描述 :</span>
+		    <textarea id="content" name="content" placeholder="Your Message to Us"></textarea>
+		</label> 
+	    <label>
+	        <span>上传照片</span>
+			<table>
+				<tr>
+					<td>
+						<form action="" method="post" id="uploadForm" enctype="multipart/form-data">
+							<table border="1" cellspacing="0" cellpadding="0">
+								<tr>
+									<td>
+									    <img width="100" height="100" id="allUrl" src="images/sample.jpg" />
+									    <input type="file" id="pic" name="file" onchange="uploadPic()" />
+									</td>
+								</tr>
+							</table>
+						</form>
+					</td>
+				</tr>
+			</table>
+		</label> 
+		<label>
+		    <span>&nbsp;</span>
+		    <input type="button" class="button" onclick="upload()" value="提交" />
+		</label>
 	</div>
 	<div id="dv"></div>
 </body>
