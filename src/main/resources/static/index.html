@@ -39,12 +39,12 @@
 						var jsonReturn = eval(data);
 						for (var i = 0; i < jsonReturn.length; i++) {
 							s += '<tr id="'+i+'"><td >' + jsonReturn[i].classId
-									+ '</td><td><input  type="button" value="'
+									+ '</td><td><input type="button" value="'
 									+ jsonReturn[i].status
 									+ '" onclick="changeStatus(' + i
 									+ ')"/></td><td>' + jsonReturn[i].deadline
-									+ '</td><td>' + jsonReturn[i].handPeople
-									+ '</td><td>' + jsonReturn[i].role
+									+ '</td><td><input type="text" value="' + jsonReturn[i].handPeople
+									+ '"/></td><td>' + jsonReturn[i].role
 									+ '</td><td>' + jsonReturn[i].task
 									+ '</td><td>' + jsonReturn[i].detail
 									+ '</td><td><textarea rows="3" cols="20">'
@@ -65,8 +65,8 @@
 			var btn = $("#" + j + " td:nth-child input[type='button'] ").val();
 			if (btn == "1") {
 				$("#" + j + " td:nth-child input[type='button'] ").val("已完成");
-				$("#" + j + " td:nth-child input[type='button'] ").attr(
-						"disabled", "disabled");
+				$("#" + j + " td:nth-child input[type='button'] ").attr("disabled", "disabled");
+				$("#" + j + " td:nth-child input[type='text'] ").attr("disabled", "disabled");
 				$("#" + j + " td:nth-child textarea").attr("disabled",
 						"disabled");
 			} else {
@@ -77,7 +77,12 @@
 	function changeStatus(id) {
 		classId = $('#' + id + ' td:nth-child(1)').text();
 		task = $('#' + id + ' td:nth-child(6)').text();
-		handPeople = $('#' + id + ' td:nth-child(4)').text();
+		handPeople = $('#' + id + ' td:nth-child input[type="text"]').val();
+		if(handPeople==""||typeof(handPeople)=="undefined"){
+			$("#" + id + " td:nth-child input[type='text'] ").attr("style", "background:#FF6161;");
+			$("#" + id + " td:nth-child input[type='text'] ").focus();
+			return;
+		}
 		comment = $('#' + id + ' td:nth-child(8) textarea').val();
 		url2 = "hwtraining-teacher-service/hwtraining/v1/tasks";
 		$.ajax({
@@ -93,12 +98,7 @@
 				comment : comment
 			},
 			success : function(data) {
-				$("#" + id + " td:nth-child input[type='button'] ").val("已完成");
-				$("#" + id + " td:nth-child input[type='button'] ").attr(
-						"disabled", "disabled");
-				$('#' + id + ' td:nth-child(8)').value = $(
-						'#' + id + ' td:nth-child(8)').text();
-				$('#' + id + ' td:nth-child(8)').attr("disabled", "disabled");
+				taskShow();
 			},
 			error : function(data) {
 				alert("Error!!!");
@@ -292,11 +292,11 @@
 									+ parseInt(jsonReturn[i].subject7)
 									+ parseInt(jsonReturn[i].subject8)
 									+ parseInt(jsonReturn[i].subject9);
-							var color = "background-color:blue";
+							var color = "background-color:#65E9B7";
 							if (total < 100) {
-								color = "background-color:red";
+								color = "background-color:#FF6161";
 							} else {
-								color = "background-color:blue";
+								color = "background-color:#65E9B7";
 							}
 							if (isLogin()) {
 								s += '<tr><td >'
@@ -439,23 +439,23 @@
 						classId : cid
 					},
 					success : function(data) {
-						var s = '<ul id="pn">';
+						var s = '<table class="forumTable" >';
 						var jsonReturn = eval(data);
 						for (var i = 0; i < jsonReturn.length; i++) {
-							s += '<li id="'+i+'" class="list0">'
-									+ '<div class="left"><span class="name">班次：'
+							s += '<tr id="'+i+'" class="list0"><td>'
+									+ '<div class="forumLeft"><span>班次：'
 									+ jsonReturn[i].classId
-									+ '</span><span class="name">产品：'
+									+ '</span><span>产品：'
 									+ jsonReturn[i].tenant
-									+ '</span><span class="name">姓名：'
+									+ '</span><span>姓名：'
 									+ +jsonReturn[i].name
-									+ '</span></div><div class="main"><div class="first"><p class="text">'
+									+ '</span></div></td><td><div class="forumMain"><div class="forumFirst"><p class="text">'
 									+ jsonReturn[i].content
-									+ '</p></div><div class="second"><image width="100%" src="'		
- 							+ jsonReturn[i].path+ '" alt=""/></div><div class="third"><span class="date">'
-									+ jsonReturn[i].time + '</span></div>';
+									+ '</p></div><div class="forumSecond"><image height="100%" src="'		
+ 							        + jsonReturn[i].path+ '" alt=""/></div><div class="forumThird"><span class="date">'
+									+ jsonReturn[i].time + '</span></div></td></tr>';
 						}
-						s += '</li></ul><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
 						$('#dv').html(s);
 						$("#forum").fadeIn(100);
 						$("#control").fadeOut(100);
@@ -480,12 +480,16 @@
 				return;
 			}
 		};
-
+		var path = $("#allUrl").attr("src");
+		if(path==""){
+			return;
+		}
 		$("#uploadForm").ajaxSubmit(options);
 	}
 	function upload() {
 		cid = classId;
 		var name = $("#userId").val();
+		var forumusername = $("#forumusername").val();
 		var tenant = $("#tenant").find("option:selected").val();
 		var content = $("#content").val();
 		var path = $("#allUrl").attr("src");
@@ -506,7 +510,12 @@
 			}),
 			success : function(data) {
 				console.log(data);
-				window.location.reload();
+				$("#userId").attr("value","");
+				$("#forumusername").attr("value","");
+				$("#content").attr("value","");
+				$("#allUrl").attr("src","images/sample.jpg");
+				alert("提交成功！");
+				forumShow();
 			},
 			error : function(data) {
 				alert("保存失败!!!");
@@ -711,46 +720,39 @@
 		</div>
 	</div>
 	<div id="forum" class="basic-grey" style="display: none;">
-		<span>请如实反馈所遇到的问题</span>
-		<label>
-		    租户名:<input id="userId" type="text" name="userId" placeholder="" />
-	             姓 名 :<input id="forumusername" type="text" name="name" placeholder="" />
-		    产 品 :<select id="tenant" name="tenant" placeholder="" >
-			    <option value="中间件">中间件</option>
-			    <option value="CCE">CCE</option>
-			    <option value="CSE">CSE</option>
-			    <option value="软件开发云">软件开发云</option>
-			    <option value="DIS">DIS</option>
-			    <option value="MRS">MRS</option>
-			</select>
-		</label> 
-		<label>
-		    <span>问题描述 :</span>
-		    <textarea id="content" name="content" placeholder="Your Message to Us"></textarea>
-		</label> 
-	    <label>
-	        <span>上传照片</span>
-			<table>
-				<tr>
-					<td>
-						<form action="" method="post" id="uploadForm" enctype="multipart/form-data">
-							<table border="1" cellspacing="0" cellpadding="0">
-								<tr>
-									<td>
-									    <img width="100" height="100" id="allUrl" src="images/sample.jpg" />
-									    <input type="file" id="pic" name="file" onchange="uploadPic()" />
-									</td>
-								</tr>
-							</table>
-						</form>
-					</td>
-				</tr>
-			</table>
-		</label> 
-		<label>
-		    <span>&nbsp;</span>
-		    <input type="button" class="button" onclick="upload()" value="提交" />
-		</label>
+		<table>
+			<tr>
+				<td>
+	                                           姓 名 :<input id="forumusername" type="text" name="name" placeholder="" />
+		                                  租户名:<input id="userId" type="text" name="userId" placeholder="" />
+		                                  产 品 :<select id="tenant" name="tenant" placeholder="" >
+		            	        <option value="中间件">中间件</option>
+		            	        <option value="CCE">CCE</option>
+		            	        <option value="CSE">CSE</option>
+		            	        <option value="软件开发云">软件开发云</option>
+		            	        <option value="DIS">DIS</option>
+		            	        <option value="MRS">MRS</option>
+		            	    </select>
+				</td>
+			</tr>
+		    <tr>
+				<td>
+		                        问题描述 :<br/><textarea id="content" name="content" placeholder="Your Message to Us"></textarea>
+				</td>
+				<td>
+					 <form action="" method="post" id="uploadForm" enctype="multipart/form-data">
+						 <img width="100" height="100" id="allUrl" src="images/sample.jpg" />
+						 <input type="file" id="pic" name="file" onchange="uploadPic()" />
+					 </form>
+				
+				</td>
+			</tr>
+			<tr>
+				<td>
+				    <input type="button" class="button" onclick="upload()" value="提交" />
+				</td>
+			</tr>
+		</table>
 	</div>
 	<div id="dv"></div>
 </body>
