@@ -16,12 +16,19 @@
 	}
 	var date = y + "" + m;
 	var classId = date;
+	$("#classId").val(classId);
 	function selectOpt() {
 		//var ads = self.parent.frames['rightFrame'].address;		
 		classId = $("#classId").find("option:selected").val();
-		taskShow();
+		var menu = $.session.get("menu");
+		if(menu=="notice"){notice();}
+		if(menu=="task"){taskShow();}
+		if(menu=="student"){studentShow();}	
+		if(menu=="score"){scoreShow();}
+		if(menu=="forum"){forumShow();}
 	}
 	function taskShow() {
+		$.session.set("menu", "task");
 		isLogin();
 		var url = "hwtraining-teacher-service/hwtraining/v1/tasks";
 		$
@@ -35,7 +42,7 @@
 						classId : classId
 					},
 					success : function(data) {
-						var s = '<table  class="tablelist" ><tr><th>班次</th><th>状态</th><th>截止时间</th><th>责任人</th><th>角色</th><th>任务</th><th>任务详情</th><th>备注</th></tr>';
+						var s = '<table  class="tablelist" ><tr><th width="50px;">班次</th><th width="60px;">状态</th><th width="100px;">截止时间</th><th width="50px;">责任人</th><th width="80px;">角色</th><th width="150px;">任务</th><th width="560px;">任务详情</th><th width="150px;">备注</th></tr>';
 						var jsonReturn = eval(data);
 						for (var i = 0; i < jsonReturn.length; i++) {
 							s += '<tr id="'+i+'"><td >' + jsonReturn[i].classId
@@ -43,11 +50,11 @@
 									+ jsonReturn[i].status
 									+ '" onclick="changeStatus(' + i
 									+ ')"/></td><td>' + jsonReturn[i].deadline
-									+ '</td><td><input type="text" value="' + jsonReturn[i].handPeople
+									+ '</td><td><input class="taskInput" type="text" value="' + jsonReturn[i].handPeople
 									+ '"/></td><td>' + jsonReturn[i].role
 									+ '</td><td>' + jsonReturn[i].task
-									+ '</td><td>' + jsonReturn[i].detail
-									+ '</td><td><textarea rows="3" cols="20">'
+									+ '</td><td title="'+ jsonReturn[i].detail +'">' + jsonReturn[i].detail
+									+ '</td><td><textarea rows="6" cols="20"  title="'+ jsonReturn[i].comment +'">'
 									+ jsonReturn[i].comment
 									+ '</textarea></td></tr>';
 						}
@@ -197,7 +204,9 @@
 						phoneNumber : phoneNumber
 					},
 					success : function(data) {
-						studentShow();
+						if((parseInt(k)+1)==check_val.length){
+							studentShow();
+						}
 					},
 					error : function(data) {
 						alert("Error!!!");
@@ -213,6 +222,7 @@
 	});
 
 	function notice() {
+		$.session.set("menu", "notice");
 		var s = '<p><b><red>华为PaaS高级培训第五期2018年3月中旬开班，现在启动报名，报名请联系各个合作伙伴对应华为接口人。</red></b></p>';
 		$('#dv').html(s);
 		$("#control").fadeOut(100);
@@ -220,6 +230,7 @@
 
 	}
 	function studentShow() {
+		$.session.set("menu", "student");
 		isLogin();
 		$("#control").fadeOut(100);
 		url = "hwtraining-teacher-service/hwtraining/v1/students";
@@ -267,6 +278,7 @@
 				});
 	}
 	function scoreShow() {
+		$.session.set("menu", "score");
 		url = "hwtraining-teacher-service/hwtraining/v1/studentscore";
 		cid = classId;
 		$
@@ -305,23 +317,23 @@
 										+ jsonReturn[i].name
 										+ '</td><td  ondblclick="changeScoreStatus(this)" ><input  type="text" class="score" value="'
 										+ jsonReturn[i].subject1
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject2
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject3
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject4
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject5
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject6
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject7
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject8
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td ondblclick="changeScoreStatus(this)"><input type="text" class="score" value="'
 										+ jsonReturn[i].subject9
-										+ '"  onblur="modifyScore(this)" disabled="" /></td><td> <input type="text" class="score" style="'+color+'" disabled="disabled" value="'+total+'"/></td></tr>';
+										+ '"  onblur="modifyScore(this)" onkeydown="if(event.keyCode==13) {modifyScore(this)}" disabled="" /></td><td> <input type="text" class="score" style="'+color+'" disabled="disabled" value="'+total+'"/></td></tr>';
 
 							} else {
 
@@ -379,9 +391,9 @@
 				+ parseInt(subject4) + parseInt(subject5) + parseInt(subject6)
 				+ parseInt(subject7) + parseInt(subject8) + parseInt(subject9);
 		if (total < 100) {
-			$(tr[11]).children("input").attr('style', "background-color:red");
+			$(tr[11]).children("input").attr('style', "background-color:#FF6161");
 		} else {
-			$(tr[11]).children("input").attr('style', "background-color:blue");
+			$(tr[11]).children("input").attr('style', "background-color:#65E9B7");
 
 		}
 		$(tr[11]).children("input").attr('value', total);
@@ -424,6 +436,7 @@
 		$(id).children("input").focus();
 	}
 	function forumShow() {
+		$.session.set("menu", "forum");
 		isLogin();
 		var cid = classId;
 		//$("#"+date).attr("selected","selected");		
@@ -493,6 +506,9 @@
 		var tenant = $("#tenant").find("option:selected").val();
 		var content = $("#content").val();
 		var path = $("#allUrl").attr("src");
+		if(path=="images/sample.jpg"){
+			path="";
+		}
 		$.ajax({
 			url : "hwtraining-teacher-service/hwtraining/v1/forumcontent",
 			type : "POST",
@@ -621,18 +637,18 @@
 		<div id="option" class="vocation" style="display: none;">
 		         班次：
 		    <select id="classId" onchange="selectOpt()">
-		        <option id="201802" value="201802">201802</option>
-				<option id="201801" value="201801">201801</option>
-				<option id="201803" value="201803">201803</option>
-				<option id="201804" value="201804">201804</option>
-				<option id="201805" value="201805">201805</option>
-				<option id="201806" value="201806">201806</option>
-				<option id="201807" value="201807">201807</option>
-				<option id="201808" value="201808">201808</option>
-				<option id="201809" value="201809">201809</option>
-				<option id="201810" value="201810">201810</option>
-				<option id="201811" value="201811">201811</option>
-				<option id="201812" value="201812">201812</option>
+				<option value="201801">201801</option>
+		        <option value="201802">201802</option>
+				<option value="201803">201803</option>
+				<option value="201804">201804</option>
+				<option value="201805">201805</option>
+				<option value="201806">201806</option>
+				<option value="201807">201807</option>
+				<option value="201808">201808</option>
+				<option value="201809">201809</option>
+				<option value="201810">201810</option>
+				<option value="201811">201811</option>
+				<option value="201812">201812</option>
 	        </select>
 		</div>
 	    <div id="logout" class="logout">
@@ -741,10 +757,11 @@
 				</td>
 				<td>
 					 <form action="" method="post" id="uploadForm" enctype="multipart/form-data">
-						 <img width="100" height="100" id="allUrl" src="images/sample.jpg" />
-						 <input type="file" id="pic" name="file" onchange="uploadPic()" />
+						 <label for="file">
+						     <img width="100" height="100" id="allUrl" src="images/sample.jpg" />
+						 </label>
+						 <input type="file" id="file" name="file" onchange="uploadPic()" style="display:none;"/>
 					 </form>
-				
 				</td>
 			</tr>
 			<tr>
