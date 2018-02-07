@@ -8,22 +8,21 @@
 <script type="text/javascript" src="js/jquery-form.js"></script>
 <script type="text/javascript" src="js/jquery-session.js"></script>
 <script type="text/javascript">
-	var t = new Date();
-	var y = t.getFullYear();
-	var m = t.getMonth() + 1;
-	if (m < 10) {
-		m = "0" + m;
-	}
-	var date = y + "" + m;
-	var classId = date;
-	$("#classId").val(classId);
+    var t = new Date();
+    var y = t.getFullYear();
+    var m = t.getMonth() + 1;
+    if (m < 10) {
+    	m = "0" + m;
+    }
+    var date = y + "" + m;
+    var classId = date;
 	function selectOpt() {
 		//var ads = self.parent.frames['rightFrame'].address;		
 		classId = $("#classId").find("option:selected").val();
 		var menu = $.session.get("menu");
 		if(menu=="notice"){notice();}
 		if(menu=="task"){taskShow();}
-		if(menu=="student"){studentShow();}	
+		if(menu=="student"){studentShow(0,0);}	
 		if(menu=="score"){scoreShow();}
 		if(menu=="forum"){forumShow();}
 	}
@@ -113,6 +112,7 @@
 		});
 	}
 	$(document).ready(function() {
+		$("#classId").val(classId);
 		var divs = document.getElementsByName("aaa");
 		var len = divs.length;
 		for(var i=0;i<len;i++){
@@ -124,6 +124,7 @@
 			};
 		}
 		//$.session.set("loggedinuser", "");
+		$.session.set("curStu", 1);
 		if(isLogin()){
 			$("#option").fadeIn(100);
 		}
@@ -166,7 +167,7 @@
 				}),
 				success : function(data) {
 					if (data == true) {
-						studentShow();
+						studentShow(0,0);
 					} else {
 						alert("false!!!");
 						return;
@@ -205,7 +206,7 @@
 					},
 					success : function(data) {
 						if((parseInt(k)+1)==check_val.length){
-							studentShow();
+							studentShow(0,0);
 						}
 					},
 					error : function(data) {
@@ -229,7 +230,10 @@
 		$("#forum").fadeOut(100);
 
 	}
-	function studentShow() {
+	function studentShow(current,cal) {
+		var num1;
+		var num2;
+		console.log("curStu类型：",typeof(current),"cal类型：",typeof(cal));
 		$.session.set("menu", "student");
 		isLogin();
 		$("#control").fadeOut(100);
@@ -248,26 +252,50 @@
 					success : function(data) {
 						var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>公司</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>备注</th></tr>';
 						var jsonReturn = eval(data);
-						for (var i = 0; i < jsonReturn.length; i++) {
-							s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><td >'
-									+ jsonReturn[i].classId
-									+ '</td><td>'
-									+ jsonReturn[i].companyName
-									+ '</td><td>'
-									+ jsonReturn[i].name
-									+ '</td><td>'
-									+ jsonReturn[i].title
-									+ '</td><td>'
-									+ jsonReturn[i].phoneNumber
-									+ '</td><td>'
-									+ jsonReturn[i].email
-									+ '</td><td>'
-									+ jsonReturn[i].hwcloudId
-									+ '</td><td><textarea disabled="disabled" rows="3" cols="20">'
-									+ jsonReturn[i].comment
-									+ '</textarea></td></tr>';
+						var totalNum = jsonReturn.length;
+						var currentNum = parseInt($.session.get("curStu"));
+						var totalPage = Math.ceil(totalNum/10);
+						if(cal != 0){
+							currentNum+=cal;
+							if(currentNum==0){
+								currentNum = 1;
+							}
 						}
-						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+						if(current != 0){
+							currentNum = current;
+						}
+						if(cal==0 && current==0){
+							currentNum = 1;
+						}
+						if(totalNum == 0){
+							totalPage =1;
+						}
+						$.session.set("curStu", currentNum);
+						num1 = (currentNum-1) * 10;
+						num2 = currentNum * 10;
+						for (var i = 0; i < jsonReturn.length; i++) {
+							if(i>=num1 && i<num2){
+								s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><td >'
+										+ jsonReturn[i].classId
+										+ '</td><td>'
+										+ jsonReturn[i].companyName
+										+ '</td><td>'
+										+ jsonReturn[i].name
+										+ '</td><td>'
+										+ jsonReturn[i].title
+										+ '</td><td>'
+										+ jsonReturn[i].phoneNumber
+										+ '</td><td>'
+										+ jsonReturn[i].email
+										+ '</td><td>'
+										+ jsonReturn[i].hwcloudId
+										+ '</td><td><textarea disabled="disabled" rows="3" cols="20">'
+										+ jsonReturn[i].comment
+										+ '</textarea></td></tr>';
+							}
+						}
+						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'"><br/>';
+						s += '<a onclick="studentShow(1,0);">首页</a><a onclick="studentShow(0,-1);">上一页</a><a onclick="studentShow(0,1);">下一页</a><a onclick="studentShow('+totalPage+',0);">尾页</a> 总条数：'+totalNum;
 						$('#dv').html(s);
 						$("#control").fadeIn(100);
 						$("#forum").fadeOut(100);
@@ -631,7 +659,7 @@
 	<div class="menu">
 		<a name="aaa" href="javascript:notice();">华为云PaaS学堂公告</a>
 		<a name="aaa" href="javascript:taskShow();">培训流程管理</a>
-		<a name="aaa" href="javascript:studentShow();">学员报名管理</a>
+		<a name="aaa" href="javascript:studentShow(0,0);">学员报名管理</a>
 		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
 		<a name="aaa" href="javascript:forumShow();">产品问题管理</a>
 		<div id="option" class="vocation" style="display: none;">
