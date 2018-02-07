@@ -24,7 +24,7 @@
 		if(menu=="task"){taskShow();}
 		if(menu=="student"){studentShow(0,0);}	
 		if(menu=="score"){scoreShow();}
-		if(menu=="forum"){forumShow();}
+		if(menu=="forum"){forumShow(0,0);}
 	}
 	function taskShow() {
 		$.session.set("menu", "task");
@@ -125,6 +125,7 @@
 		}
 		//$.session.set("loggedinuser", "");
 		$.session.set("curStu", 1);
+		$.session.set("curForum", 1);
 		if(isLogin()){
 			$("#option").fadeIn(100);
 		}
@@ -463,7 +464,9 @@
 		$(id).children("input").attr("disabled", false);
 		$(id).children("input").focus();
 	}
-	function forumShow() {
+	function forumShow(current,cal) {
+		var num1;
+		var num2;
 		$.session.set("menu", "forum");
 		isLogin();
 		var cid = classId;
@@ -482,21 +485,45 @@
 					success : function(data) {
 						var s = '<table class="forumTable" >';
 						var jsonReturn = eval(data);
+						var totalNum = jsonReturn.length;
+						var currentNum = parseInt($.session.get("curForum"));
+						var totalPage = Math.ceil(totalNum/10);
+						if(cal != 0){
+							currentNum+=cal;
+							if(currentNum==0){
+								currentNum = 1;
+							}
+						}
+						if(current != 0){
+							currentNum = current;
+						}
+						if(cal==0 && current==0){
+							currentNum = 1;
+						}
+						if(totalNum == 0){
+							totalPage =1;
+						}
+						$.session.set("curForum", currentNum);
+						num1 = (currentNum-1) * 10;
+						num2 = currentNum * 10;
 						for (var i = 0; i < jsonReturn.length; i++) {
-							s += '<tr id="'+i+'" class="list0"><td>'
-									+ '<div class="forumLeft"><span>班次：'
-									+ jsonReturn[i].classId
-									+ '</span><span>产品：'
-									+ jsonReturn[i].tenant
-									+ '</span><span>姓名：'
-									+ +jsonReturn[i].name
-									+ '</span></div></td><td><div class="forumMain"><div class="forumFirst"><p class="text">'
-									+ jsonReturn[i].content
-									+ '</p></div><div class="forumSecond"><image height="100%" src="'		
- 							        + jsonReturn[i].path+ '" alt=""/></div><div class="forumThird"><span class="date">'
-									+ jsonReturn[i].time + '</span></div></td></tr>';
+							if(i>=num1 && i<num2){
+								s += '<tr id="'+i+'" class="list0"><td>'
+										+ '<div class="forumLeft"><span>班次：'
+										+ jsonReturn[i].classId
+										+ '</span><span>产品：'
+										+ jsonReturn[i].tenant
+										+ '</span><span>姓名：'
+										+ +jsonReturn[i].name
+										+ '</span></div></td><td><div class="forumMain"><div class="forumFirst"><p class="text">'
+										+ jsonReturn[i].content
+										+ '</p></div><div class="forumSecond"><image height="100%" src="'		
+	 							        + jsonReturn[i].path+ '" alt=""/></div><div class="forumThird"><span class="date">'
+										+ jsonReturn[i].time + '</span></div></td></tr>';
+							}
 						}
 						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
+						s += '<a onclick="forumShow(1,0);">首页</a><a onclick="forumShow(0,-1);">上一页</a><a onclick="forumShow(0,1);">下一页</a><a onclick="forumShow('+totalPage+',0);">尾页</a> 总条数：'+totalNum;
 						$('#dv').html(s);
 						$("#forum").fadeIn(100);
 						$("#control").fadeOut(100);
@@ -559,7 +586,7 @@
 				$("#content").attr("value","");
 				$("#allUrl").attr("src","images/sample.jpg");
 				alert("提交成功！");
-				forumShow();
+				forumShow(0,0);
 			},
 			error : function(data) {
 				alert("保存失败!!!");
@@ -661,7 +688,7 @@
 		<a name="aaa" href="javascript:taskShow();">培训流程管理</a>
 		<a name="aaa" href="javascript:studentShow(0,0);">学员报名管理</a>
 		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
-		<a name="aaa" href="javascript:forumShow();">产品问题管理</a>
+		<a name="aaa" href="javascript:forumShow(0,0);">产品问题管理</a>
 		<div id="option" class="vocation" style="display: none;">
 		         班次：
 		    <select id="classId" onchange="selectOpt()">
