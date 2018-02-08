@@ -46,7 +46,7 @@ under the License.
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <localRepository>E:\repository\servicecomb</localRepository> 
+  <!-- <localRepository>E:\repository\servicecomb</localRepository>  -->
  <!-- localRepository
    | The path to the local repository maven will use to store artifacts.
    |
@@ -104,7 +104,6 @@ under the License.
     </proxy>
     -->
     <proxy>
-            <id>proxy1</id>
             <active>true</active>
             <protocol>http</protocol>
             <host>10.10.23.191</host>
@@ -112,7 +111,6 @@ under the License.
             <nonProxyHosts>*.huaweicloud.com|*.hwclouds.com</nonProxyHosts>
         </proxy>
         <proxy>
-            <id>proxy1</id>
             <active>true</active>
             <protocol>https</protocol>
             <host>10.10.23.191</host>
@@ -126,7 +124,7 @@ under the License.
    | Authentication profiles can be used whenever maven must make a connection to a remote server.
    |-->
   <servers>
-  <server>
+  <!-- <server>
     <id>huaweicloud</id>
     <username>anonymous</username>
     <password>devcloud</password>
@@ -135,7 +133,7 @@ under the License.
     <id>huaweicloudsdk</id>
     <username>anonymous</username>
     <password>devcloud</password>
-</server>
+</server> -->
     <!-- server
      | Specifies the authentication information to use when connecting to a particular server, identified by
      | a unique name within the system (referred to by the 'id' attribute below).
@@ -173,7 +171,7 @@ under the License.
  <mirrors>
      <mirror>
       <id>mirrorId</id>
-      <mirrorOf>central</mirrorOf>
+      <mirrorOf>*</mirrorOf>
       <name>Mirror of Huawei CSE.</name>
       <url>http://maven.huaweicse.com/nexus/content/groups/public</url>
     </mirror>
