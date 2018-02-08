@@ -9,15 +9,21 @@
 <script type="text/javascript" src="js/jquery-session.js"></script>
 <script type="text/javascript">
     var t = new Date();
-    var y = t.getFullYear();
-    var m = t.getMonth() + 1;
-    if (m < 10) {
-    	m = "0" + m;
+    var year = t.getFullYear();
+    var month = add_zero(t.getMonth() + 1);
+    var day = add_zero(t.getDate());
+    var hour = add_zero(t.getHours());
+    var minute = add_zero(t.getMinutes());
+    var second = add_zero(t.getSeconds());
+    
+    var date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+    var classId = year + "" + month;
+    
+    function add_zero(temp){
+    	if(temp<10){return "0"+temp;}
+    	else return temp;
     }
-    var date = y + "" + m;
-    var classId = date;
 	function selectOpt() {
-		//var ads = self.parent.frames['rightFrame'].address;		
 		classId = $("#classId").find("option:selected").val();
 		var menu = $.session.get("menu");
 		if(menu=="notice"){notice();}
@@ -123,7 +129,6 @@
 				this.style= "background-position:left -56px;";
 			};
 		}
-		//$.session.set("loggedinuser", "");
 		$.session.set("curStu", 1);
 		$.session.set("curForum", 1);
 		if(isLogin()){
@@ -335,7 +340,7 @@
 									+ parseInt(jsonReturn[i].subject9);
 							var color = "background-color:#65E9B7";
 							if (total < 100) {
-								color = "background-color:#FF6161";
+								color = "background-color:#FFB6C1";
 							} else {
 								color = "background-color:#65E9B7";
 							}
@@ -403,6 +408,15 @@
 					}
 				});
 	}
+	function numberPattern(score){
+		var pattern = /^[1-9][0-9]?$/,
+		if(pattern.test(score)){
+			return true;
+		}else{
+			return false;
+		}
+	    console.log(pattern.test(score));
+	}
 	function modifyScore(id) {
 		var tr = $(id).parent().parent().children();
 		classId = $(tr[0]).text();
@@ -420,7 +434,7 @@
 				+ parseInt(subject4) + parseInt(subject5) + parseInt(subject6)
 				+ parseInt(subject7) + parseInt(subject8) + parseInt(subject9);
 		if (total < 100) {
-			$(tr[11]).children("input").attr('style', "background-color:#FF6161");
+			$(tr[11]).children("input").attr('style', "background-color:#FFB6C1");
 		} else {
 			$(tr[11]).children("input").attr('style', "background-color:#65E9B7");
 
@@ -470,7 +484,6 @@
 		$.session.set("menu", "forum");
 		isLogin();
 		var cid = classId;
-		//$("#"+date).attr("selected","selected");		
 		url = "hwtraining-teacher-service/hwtraining/v1/forumcontent";
 		$
 				.ajax({
@@ -509,17 +522,14 @@
 						for (var i = 0; i < jsonReturn.length; i++) {
 							if(i>=num1 && i<num2){
 								s += '<tr id="'+i+'" class="list0"><td>'
-										+ '<div class="forumLeft"><span>班次：'
-										+ jsonReturn[i].classId
-										+ '</span><span>产品：'
-										+ jsonReturn[i].tenant
-										+ '</span><span>姓名：'
-										+ +jsonReturn[i].name
-										+ '</span></div></td><td><div class="forumMain"><div class="forumFirst"><p class="text">'
-										+ jsonReturn[i].content
-										+ '</p></div><div class="forumSecond"><image height="100%" src="'		
-	 							        + jsonReturn[i].path+ '" alt=""/></div><div class="forumThird"><span class="date">'
-										+ jsonReturn[i].time + '</span></div></td></tr>';
+										+ '<div class="forumLeft"><span>班次：' + jsonReturn[i].classId + '</span>'
+										+ '<span>产品：' + jsonReturn[i].tenant + '</span>'
+										+ '<span>姓名：' + jsonReturn[i].name + '</span></div></td>'
+										+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'	+ jsonReturn[i].content	+ '</p></div><div class="forumSecond">';
+								if(jsonReturn[i].path !="" ){
+									s+= '<a href="'+jsonReturn[i].path+'" target="_blank">点击打开图片</a>';
+								}
+								s+= '</div><div class="forumThird"><span class="date">' + jsonReturn[i].time + '</span></div></td></tr>';
 							}
 						}
 						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
@@ -575,7 +585,7 @@
 				classId : cid,
 				name : name,
 				tenant : tenant,
-				time : "2018-01-30 15:36:45",
+				time : date,
 				content : content,
 				path : path
 			}),
