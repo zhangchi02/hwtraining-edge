@@ -170,7 +170,7 @@ under the License.
    |-->
  <mirrors>
      <mirror>
-      <id>z_mirrors</id>
+      <id>a_mirrors</id>
       <mirrorOf>central</mirrorOf>
       <name>Mirror of Huawei CSE.</name>
       <url>http://maven.huaweicse.com/nexus/content/groups/public</url>
