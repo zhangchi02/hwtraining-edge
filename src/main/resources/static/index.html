@@ -31,6 +31,7 @@
 		if(menu=="student"){studentShow(0,0);}	
 		if(menu=="score"){scoreShow();}
 		if(menu=="forum"){forumShow(0,0);}
+		if(menu=="survey"){surveyShow();}
 	}
 	function taskShow() {
 		$.session.set("menu", "task");
@@ -125,6 +126,16 @@
 			divs[i].onclick = function(){
 				for(var j=0;j<len;j++){
 					divs[j].style = "";
+				}
+				this.style= "background-position:left -56px;";
+			};
+		}
+		var divsb = document.getElementsByName("bbb");
+		var lenb = divsb.length;
+		for(var i=0;i<lenb;i++){
+			divsb[i].onclick = function(){
+				for(var j=0;j<lenb;j++){
+					divsb[j].style = "";
 				}
 				this.style= "background-position:left -56px;";
 			};
@@ -232,9 +243,9 @@
 		$.session.set("menu", "notice");
 		var s = '<p><b><red>华为PaaS高级培训第五期2018年3月中旬开班，现在启动报名，报名请联系各个合作伙伴对应华为接口人。</red></b></p>';
 		$('#dv').html(s);
-		$("#control").fadeOut(100);
-		$("#forum").fadeOut(100);
-
+		$("#control").fadeOut(10);
+		$("#forum").fadeOut(10);
+		$("#survey").fadeOut(10);
 	}
 	function studentShow(current,cal) {
 		var num1;
@@ -305,6 +316,7 @@
 						$('#dv').html(s);
 						$("#control").fadeIn(100);
 						$("#forum").fadeOut(100);
+						$("#survey").fadeOut(100);
 					},
 					error : function(XMLHttpRequest) {
 						commonaction(XMLHttpRequest);
@@ -402,21 +414,22 @@
 						$('#dv').html(s);
 						$("#control").fadeOut(100);
 						$("#forum").fadeOut(100);
+						$("#survey").fadeOut(100);
 					},
 					error : function(data) {
 						alert("Error!!!");
 					}
 				});
 	}
-	/* function numberPattern(score){
-		var pattern = /^[1-9][0-9]?$/,
+	function numberPattern(score){
+		var pattern = /^[1-9][0-9]?$/;
 		if(pattern.test(score)){
 			return true;
 		}else{
 			return false;
 		}
 	    console.log(pattern.test(score));
-	} */
+	}
 	function modifyScore(id) {
 		var tr = $(id).parent().parent().children();
 		classId = $(tr[0]).text();
@@ -537,6 +550,7 @@
 						$('#dv').html(s);
 						$("#forum").fadeIn(100);
 						$("#control").fadeOut(100);
+						$("#survey").fadeOut(100);
 					},
 					error : function(data) {
 						alert("查询问题失败！");
@@ -670,23 +684,69 @@
 			return true;
 		}
 	}
-	function getSessionId(){
-        var c_name = 'JSESSIONID';  
-        if(document.cookie.length>0){  
-           c_start=document.cookie.indexOf(c_name + "="); 
-           if(c_start!=-1){ 
-             c_start=c_start + c_name.length+1;
-             c_end=document.cookie.indexOf(";",c_start);  
-             if(c_end==-1) c_end=document.cookie.length;  
-             return unescape(document.cookie.substring(c_start,c_end));  
-           }else{
-                //手动从后台传来sessionid
-              var JSESSIONID = $('#JSESSIONID').val();
-              return JSESSIONID;
-           }
-        }
-    }
-	
+	function surveyShow(){
+		$.session.set("menu", "survey");
+		$('#dv').html("");
+		$("#forum").fadeOut(10);
+		$("#control").fadeOut(10);
+		$("#survey").fadeIn(100);
+		dayShow(1);
+	}
+	function dayShow(day){
+		if(day==1){
+		    $("#surveyDay1").fadeIn(10);
+		    $("#surveyDay2").fadeOut(10);
+		    $("#surveyDay3").fadeOut(10);
+		}
+		if(day==2){
+		    $("#surveyDay2").fadeIn(10);
+		    $("#surveyDay1").fadeOut(10);
+		    $("#surveyDay3").fadeOut(10);
+		}
+		if(day==3){
+		    $("#surveyDay3").fadeIn(10);
+		    $("#surveyDay1").fadeOut(10);
+		    $("#surveyDay2").fadeOut(10);
+		}
+	}
+	function review(day){
+		var re=[];
+		for(var i=1;i<7;i++){
+			var radios = document.getElementsByName("day"+day+"0"+i);
+			var len = radios.length;
+			for(var j=0;j<len;j++){
+				if (radios[j].checked) {  
+		            re[i-1]=radios[j].value;
+		        }  
+			}
+		}
+		var comment = $("#day"+day+"07").val();
+		var re1 = "PaaS整体解决方案满意度1,"+re[0]+",PaaS整体解决方案满意度2,"+re[1]+",云中间件满意度1,"+re[2]+",云中间件满意度2,"+re[3]+",CCE满意度1,"+re[4]+",CCE满意度2,"+re[5]+",建议,"+comment;
+		var re2 = "DevOps开发满意度1,"+re[0]+",DevOps开发满意度2,"+re[1]+",DevOps运维满意度1,"+re[2]+",DevOps运维满意度2,"+re[3]+",实战满意度1,"+re[4]+",实战满意度2,"+re[5]+",建议,"+comment;
+		var re3 = "EI解决方案满意度1,"+re[0]+",EI解决方案满意度2,"+re[1]+",大数据平台满意度1,"+re[2]+",大数据平台满意度2,"+re[3]+",人工智能满意度1,"+re[4]+",人工智能满意度2,"+re[5]+",建议,"+comment;
+		var rev;
+		if(day==1){rev = re1;}
+		if(day==2){rev = re2;}
+		if(day==3){rev = re3;}
+		$.ajax({
+			url : "hwtraining-teacher-service/hwtraining/v1/survey",
+			type : "POST",
+			contentType : "application/json",
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : JSON.stringify({
+				classId : classId,
+				day : day,
+				comment : rev
+			}),
+			success : function(data) {
+				surveyShow();
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+			},
+		});
+	}
 </script>
 </head>
 <body>
@@ -699,6 +759,7 @@
 		<a name="aaa" href="javascript:studentShow(0,0);">学员报名管理</a>
 		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
 		<a name="aaa" href="javascript:forumShow(0,0);">产品问题管理</a>
+		<a name="aaa" href="javascript:surveyShow();">课程反馈</a>
 		<div id="option" class="vocation" style="display: none;">
 		         班次：
 		    <select id="classId" onchange="selectOpt()">
@@ -818,7 +879,7 @@
 			</tr>
 		    <tr>
 				<td>
-		                        问题描述 :<br/><textarea id="content" name="content" placeholder="Your Message to Us"></textarea>
+		                        问题描述 :<br/><textarea id="content" name="content" placeholder="Your Message to Us"></textarea><br/>您最多可输入1000字
 				</td>
 				<td>
 					 <form action="" method="post" id="uploadForm" enctype="multipart/form-data">
@@ -835,6 +896,157 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	<div id="survey">
+	    <div class="menu"> 
+		    <a name="bbb" href="javascript:dayShow(1);">Day1</a>
+		    <a name="bbb" href="javascript:dayShow(2);">Day2</a>
+		    <a name="bbb" href="javascript:dayShow(3);">Day3</a>
+	    </div>
+		<div id="surveyHead">
+			<p>您好，感谢您参加此次培训，为使后续的培训能够更好的满足学院的需求，请您花费1分钟，对培训课程给出您的满意度评价。此次问卷为不记名调查，请您放心填写，我们需要您的真实反馈。</p>
+		</div>
+		<div id="surveyDay1">
+			<p>1、对《深入理解云计算PaaS&华为云PaaS整体解决方案》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day101" value="1"/>1
+			<input type="radio" name="day101" value="2"/>2
+			<input type="radio" name="day101" value="3"/>3
+			<input type="radio" name="day101" value="4"/>4
+			<input type="radio" name="day101" value="5"/>5非常满意</p>
+			<p>2、《深入理解云计算PaaS&华为云PaaS整体解决方案》的课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day102" value="1"/>1
+			<input type="radio" name="day102" value="2"/>2
+			<input type="radio" name="day102" value="3"/>3
+			<input type="radio" name="day102" value="4"/>4
+			<input type="radio" name="day102" value="5"/>5非常满意</p>
+			<p>3、对课程《掌握云中间件服务》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day103" value="1"/>1
+			<input type="radio" name="day103" value="2"/>2
+			<input type="radio" name="day103" value="3"/>3
+			<input type="radio" name="day103" value="4"/>4
+			<input type="radio" name="day103" value="5"/>5非常满意</p>
+			<p>4、《掌握云中间件服务》的课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day104" value="1"/>1
+			<input type="radio" name="day104" value="2"/>2
+			<input type="radio" name="day104" value="3"/>3
+			<input type="radio" name="day104" value="4"/>4
+			<input type="radio" name="day104" value="5"/>5非常满意</p>
+			<p>5、对课程《CCE容器引擎实现应用快速上线》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day105" value="1"/>1
+			<input type="radio" name="day105" value="2"/>2
+			<input type="radio" name="day105" value="3"/>3
+			<input type="radio" name="day105" value="4"/>4
+			<input type="radio" name="day105" value="5"/>5非常满意</p>
+			<p>6、《CCE容器引擎实现应用快速上线》的课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day106" value="1"/>1
+			<input type="radio" name="day106" value="2"/>2
+			<input type="radio" name="day106" value="3"/>3
+			<input type="radio" name="day106" value="4"/>4
+			<input type="radio" name="day106" value="5"/>5非常满意</p>
+			<p>7、写下您的宝贵意见<br/>
+			<textarea name="day1" id="day107"></textarea></p>
+			<button onclick="review(1)">提交</button>
+		</div>
+		<div id="surveyDay2">
+			<p>1、对课程《企业应用云化Devops（微服务开发、上线、治理）》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day201" value="1"/>1
+			<input type="radio" name="day201" value="2"/>2
+			<input type="radio" name="day201" value="3"/>3
+			<input type="radio" name="day201" value="4"/>4
+			<input type="radio" name="day201" value="5"/>5非常满意</p>
+			<p>2、《企业应用云化Devops（微服务开发、上线、治理）》的课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day202" value="1"/>1
+			<input type="radio" name="day202" value="2"/>2
+			<input type="radio" name="day202" value="3"/>3
+			<input type="radio" name="day202" value="4"/>4
+			<input type="radio" name="day202" value="5"/>5非常满意</p>
+			<p>3、对课程《企业应用云化Devops（微服务运维）》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day203" value="1"/>1
+			<input type="radio" name="day203" value="2"/>2
+			<input type="radio" name="day203" value="3"/>3
+			<input type="radio" name="day203" value="4"/>4
+			<input type="radio" name="day203" value="5"/>5非常满意</p>
+			<p>4、《企业应用云化Devops（微服务运维）》课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day204" value="1"/>1
+			<input type="radio" name="day204" value="2"/>2
+			<input type="radio" name="day204" value="3"/>3
+			<input type="radio" name="day204" value="4"/>4
+			<input type="radio" name="day204" value="5"/>5非常满意</p>
+			<p>5、对课程《实战：基于微服务、容器技术构建航空订票系统》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day205" value="1"/>1
+			<input type="radio" name="day205" value="2"/>2
+			<input type="radio" name="day205" value="3"/>3
+			<input type="radio" name="day205" value="4"/>4
+			<input type="radio" name="day205" value="5"/>5非常满意</p>
+			<p>6、《实战：基于微服务、容器技术构建航空订票系统》课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day206" value="1"/>1
+			<input type="radio" name="day206" value="2"/>2
+			<input type="radio" name="day206" value="3"/>3
+			<input type="radio" name="day206" value="4"/>4
+			<input type="radio" name="day206" value="5"/>5非常满意</p>
+			<p>7、写下您的宝贵意见<br/>
+			<textarea name="day2" id="day207"></textarea></p>
+			<button onclick="review(2)">提交</button>
+		</div>
+		<div id="surveyDay3">
+			<p>1、对课程《深入理解华为云EI（企业智能）解决方案》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day301" value="1"/>1
+			<input type="radio" name="day301" value="2"/>2
+			<input type="radio" name="day301" value="3"/>3
+			<input type="radio" name="day301" value="4"/>4
+			<input type="radio" name="day301" value="5"/>5非常满意</p>
+			<p>2、《深入理解华为云EI（企业智能）解决方案》的课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day302" value="1"/>1
+			<input type="radio" name="day302" value="2"/>2
+			<input type="radio" name="day302" value="3"/>3
+			<input type="radio" name="day302" value="4"/>4
+			<input type="radio" name="day302" value="5"/>5非常满意</p>
+			<p>3、对课程《掌握华为云EI大数据平台服务（DIS、MRS）》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day303" value="1"/>1
+			<input type="radio" name="day303" value="2"/>2
+			<input type="radio" name="day303" value="3"/>3
+			<input type="radio" name="day303" value="4"/>4
+			<input type="radio" name="day303" value="5"/>5非常满意</p>
+			<p>4、《掌握华为云EI大数据平台服务（DIS、MRS）》课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day304" value="1"/>1
+			<input type="radio" name="day304" value="2"/>2
+			<input type="radio" name="day304" value="3"/>3
+			<input type="radio" name="day304" value="4"/>4
+			<input type="radio" name="day304" value="5"/>5非常满意</p>
+			<p>5、对课程《掌握华为云EI人工智能基础平台服务（MLS）》的满意度<br/>
+			非常不满意
+			<input type="radio" name="day305" value="1"/>1
+			<input type="radio" name="day305" value="2"/>2
+			<input type="radio" name="day305" value="3"/>3
+			<input type="radio" name="day305" value="4"/>4
+			<input type="radio" name="day305" value="5"/>5非常满意</p>
+			<p>6、《掌握华为云EI人工智能基础平台服务（MLS）》课程讲师表达清晰，重点突出<br/>
+			非常不满意
+			<input type="radio" name="day306" value="1"/>1
+			<input type="radio" name="day306" value="2"/>2
+			<input type="radio" name="day306" value="3"/>3
+			<input type="radio" name="day306" value="4"/>4
+			<input type="radio" name="day306" value="5"/>5非常满意</p>
+			<p>7、写下您的宝贵意见<br/>
+			<textarea name="day3" id="day307"></textarea></p>
+			<button onclick="review(3)">提交</button>
+		</div>
 	</div>
 	<div id="dv"></div>
 </body>

@@ -325,6 +325,7 @@ margin-top: 2px;outline: 0 none;padding: 3px 3px 3px 5px;width: 100px;font-size:
 .forumLeft {width: 170px;height: 500px;float: left;padding: 20px 10px 20px 20px;}
 .forumMain {width: 960px;height: 500px;float: left;line-height: 20px;font-size: 14px;padding: 20px 10px 20px 10px;}
 .forumFirst {width: 1000px;height: 100px;margin: 5px 0;}
+.forumFirst .text{width: 980px}
 .forumSecond {width: 1000px;height: 360px;margin: 5px 0;}
 .forumThird {width: 1000px;height: 60px;margin: 5px 0;}
 .date {	float: left;color: #808080;}
