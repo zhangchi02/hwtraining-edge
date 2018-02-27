@@ -17,11 +17,28 @@
     var second = add_zero(t.getSeconds());
     
     var date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-    var classId = year + "" + month;
     
     function add_zero(temp){
     	if(temp<10){return "0"+temp;}
     	else return temp;
+    }
+    var classId;
+    function getClassId(){
+	    url = "hwtraining-teacher-service/hwtraining/v1/currentclassid";
+	    $.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {},
+			success : function(data) {
+				classId = data;
+			},
+			error : function(data) {
+				alert("Error!!!");
+			}
+		});
     }
 	function selectOpt() {
 		classId = $("#classId").find("option:selected").val();
@@ -35,6 +52,7 @@
 	}
 	function taskShow() {
 		$.session.set("menu", "task");
+		var classIds = $("#classId").find("option:selected").val();
 		isLogin();
 		$("#survey").fadeOut(10);
 		var url = "hwtraining-teacher-service/hwtraining/v1/tasks";
@@ -46,7 +64,7 @@
 					cache : false,
 					async : false,
 					data : {
-						classId : classId
+						classId : classIds
 					},
 					success : function(data) {
 						var s = '<table  class="tablelist" ><tr><th width="50px;">班次</th><th width="60px;">状态</th><th width="100px;">截止时间</th><th width="50px;">责任人</th><th width="80px;">角色</th><th width="150px;">任务</th><th width="560px;">任务详情</th><th width="150px;">备注</th></tr>';
@@ -120,6 +138,7 @@
 		});
 	}
 	$(document).ready(function() {
+		getClassId();
 		$("#classId").val(classId);
 		var divs = document.getElementsByName("aaa");
 		var len = divs.length;
@@ -148,6 +167,12 @@
 		}
 		notice();
 		$("#clickAdd").click(function() {
+			var classIds = $("#classId").find("option:selected").val();
+			getClassId();
+			if(classIds!=classId){
+				alert("请切换到正确的班次："+classId+"！！！");
+				return;
+			}
 			$("#tipAdd").fadeIn(200);
 		});
 		$("#clickDelete").click(function() {
@@ -251,6 +276,7 @@
 	function studentShow(current,cal) {
 		var num1;
 		var num2;
+		var classIds = $("#classId").find("option:selected").val();
 		//console.log("curStu类型：",typeof(current),"cal类型：",typeof(cal));
 		$.session.set("menu", "student");
 		isLogin();
@@ -266,7 +292,7 @@
 					cache : false,
 					async : false,
 					data : {
-						classId : classId
+						classId : classIds
 					},
 					success : function(data) {
 						var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>公司</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>备注</th></tr>';
@@ -326,8 +352,9 @@
 	}
 	function scoreShow() {
 		$.session.set("menu", "score");
+		var classIds = $("#classId").find("option:selected").val();
 		url = "hwtraining-teacher-service/hwtraining/v1/studentscore";
-		cid = classId;
+		cid = classIds;
 		$
 				.ajax({
 					type : "GET",
@@ -496,8 +523,9 @@
 		var num1;
 		var num2;
 		$.session.set("menu", "forum");
+		var classIds = $("#classId").find("option:selected").val();
 		isLogin();
-		var cid = classId;
+		var cid = classIds;
 		url = "hwtraining-teacher-service/hwtraining/v1/forumcontent";
 		$
 				.ajax({
@@ -712,6 +740,7 @@
 		}
 	}
 	function review(day){
+		getClassId();
 		var re=[];
 		for(var i=1;i<7;i++){
 			var radios = document.getElementsByName("day"+day+"0"+i);
@@ -743,7 +772,15 @@
 				comment : rev
 			}),
 			success : function(data) {
-				surveyShow();
+				alert("感谢您的评价！！！");
+				/* for(var i=1;i<7;i++){
+					var radios = document.getElementsByName("day"+day+"0"+i);
+					var len = radios.length;
+					for(var j=0;j<len;j++){
+				       radios[j].attr("checked",false);
+					}
+				} */
+				$("#day"+day+"07").attr("value","");
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 			},

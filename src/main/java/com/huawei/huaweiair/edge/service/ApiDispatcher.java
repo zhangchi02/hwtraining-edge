@@ -153,7 +153,7 @@ public class ApiDispatcher extends AbstractEdgeDispatcher {
 		}
 		HttpMethod httpMethod = context.request().method();
 		if (path.contains("/hwtraining/v1/forumcontent") || (path.startsWith("/hwtraining/v1/studentscore") && httpMethod.name().equals(HttpMethod.GET.name()))
-				||path.contains("/hwtraining/v1/survey")) {
+				||path.contains("/hwtraining/v1/survey")||path.contains("/hwtraining/v1/currentclassid")) {
 
 		} else {
 
