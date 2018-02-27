@@ -36,6 +36,7 @@
 	function taskShow() {
 		$.session.set("menu", "task");
 		isLogin();
+		$("#survey").fadeOut(10);
 		var url = "hwtraining-teacher-service/hwtraining/v1/tasks";
 		$
 				.ajax({
@@ -250,10 +251,11 @@
 	function studentShow(current,cal) {
 		var num1;
 		var num2;
-		console.log("curStu类型：",typeof(current),"cal类型：",typeof(cal));
+		//console.log("curStu类型：",typeof(current),"cal类型：",typeof(cal));
 		$.session.set("menu", "student");
 		isLogin();
-		$("#control").fadeOut(100);
+		$("#control").fadeOut(10);
+		$("#survey").fadeOut(10);
 		url = "hwtraining-teacher-service/hwtraining/v1/students";
 		$
 				.ajax({
@@ -316,7 +318,6 @@
 						$('#dv').html(s);
 						$("#control").fadeIn(100);
 						$("#forum").fadeOut(100);
-						$("#survey").fadeOut(100);
 					},
 					error : function(XMLHttpRequest) {
 						commonaction(XMLHttpRequest);
@@ -537,7 +538,7 @@
 								s += '<tr id="'+i+'" class="list0"><td>'
 										+ '<div class="forumLeft"><span>班次：' + jsonReturn[i].classId + '</span>'
 										+ '<span>产品：' + jsonReturn[i].tenant + '</span>'
-										+ '<span>姓名：' + jsonReturn[i].name + '</span></div></td>'
+										+ '<span>姓名：' + jsonReturn[i].forumusername + '</span></div></td>'
 										+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'	+ jsonReturn[i].content	+ '</p></div><div class="forumSecond">';
 								if(jsonReturn[i].path !="" ){
 									s+= '<a href="'+jsonReturn[i].path+'" target="_blank">点击打开图片</a>';
@@ -597,6 +598,7 @@
 			async : false,
 			data : JSON.stringify({
 				classId : cid,
+				forumusername : forumusername,
 				name : name,
 				tenant : tenant,
 				time : date,
@@ -865,7 +867,7 @@
 		<table>
 			<tr>
 				<td>
-	                                           姓 名 :<input id="forumusername" type="text" name="name" placeholder="" />
+	                                           姓 名 :<input id="forumusername" type="text" name="forumusername" placeholder="" />
 		                                  租户名:<input id="userId" type="text" name="userId" placeholder="" />
 		                                  产 品 :<select id="tenant" name="tenant" placeholder="" >
 		            	        <option value="中间件">中间件</option>
@@ -874,6 +876,8 @@
 		            	        <option value="软件开发云">软件开发云</option>
 		            	        <option value="DIS">DIS</option>
 		            	        <option value="MRS">MRS</option>
+		            	        <option value="MLS">MLS</option>
+		            	        <option value="其他">其他</option>
 		            	    </select>
 				</td>
 			</tr>
