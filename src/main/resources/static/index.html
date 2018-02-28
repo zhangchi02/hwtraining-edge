@@ -289,6 +289,7 @@
 		isLogin();
 		$("#control").fadeOut(10);
 		$("#survey").fadeOut(10);
+		$("#notice").fadeOut(10);
 		url = "hwtraining-teacher-service/hwtraining/v1/students";
 		$
 				.ajax({
@@ -355,7 +356,6 @@
 						$('#dv').html(s);
 						$("#control").fadeIn(100);
 						$("#forum").fadeOut(100);
-						$("#notice").fadeOut(10);
 					},
 					error : function(XMLHttpRequest) {
 						commonaction(XMLHttpRequest);
@@ -579,7 +579,8 @@
 								s += '<tr id="'+i+'" class="list0"><td>'
 										+ '<div class="forumLeft"><span>班次：' + jsonReturn[i].classId + '</span>'
 										+ '<span>产品：' + jsonReturn[i].tenant + '</span>'
-										+ '<span>姓名：' + jsonReturn[i].forumusername + '</span></div></td>'
+										+ '<span>姓名：' + jsonReturn[i].forumusername + '</span>'
+										+ '<span>租户名：' + jsonReturn[i].name +'</span></div></td>'
 										+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'	+ jsonReturn[i].content	+ '</p></div><div class="forumSecond">';
 								if(jsonReturn[i].path !="" ){
 									s+= '<div class="forumSecond"> <a href="'+jsonReturn[i].path+'" target="_blank"><image height="360px" src="'+ jsonReturn[i].path+ '" alt=""/></a></div>';
