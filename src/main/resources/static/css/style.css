@@ -118,11 +118,12 @@ h2{font-weight:normal;}
 .tablelist{border:solid 1px #cbcbcb; width:100%; clear:both;}
 .tablelist tr{border:solid 1px #cbcbcb}
 .tablelist th{background:url(../images/th.gif) repeat-x; height:34px; line-height:34px; border-bottom:solid 1px #b6cad2; text-indent:11px; text-align:left;}
-.tablelist td{line-height:50px; text-indent:5px; border-right: dotted 1px #c7c7c7;}
+.tablelist td{line-height:30px; text-indent:5px; border-right: dotted 1px #c7c7c7;}
 .tablelink{color:#056dae;}
 .tablelist tbody tr.odd{background:#f5f8fa;}
 .tablelist tbody tr:hover{background:#e5ebee;}
 .sort{padding-left:3px;}
+.noticecontent{style="text-align: center;"}
 
 /*page*/
 .pagin{position:relative;margin-top:10px;padding:0 12px;}
@@ -335,3 +336,4 @@ a:link.menu, a:visited.menu {display: block;width: 120px;font-weight: bold;	colo
 a:hover.menu, a:active.menu {background-color: #cc0000;}
 
 .taskInput{width:50px;}
+.surveryStyle p{font-size:11pt;line-height:35px;}
