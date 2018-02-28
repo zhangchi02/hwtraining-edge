@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>华为云PaaS学堂</title>
+<title>华为云PaaS&EI学堂</title>
 <link href="css/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery-form.js"></script>
@@ -55,6 +55,7 @@
 		var classIds = $("#classId").find("option:selected").val();
 		isLogin();
 		$("#survey").fadeOut(10);
+		$("#notice").fadeOut(10);
 		var url = "hwtraining-teacher-service/hwtraining/v1/tasks";
 		$
 				.ajax({
@@ -67,7 +68,7 @@
 						classId : classIds
 					},
 					success : function(data) {
-						var s = '<table  class="tablelist" ><tr><th width="50px;">班次</th><th width="60px;">状态</th><th width="100px;">截止时间</th><th width="50px;">责任人</th><th width="80px;">角色</th><th width="150px;">任务</th><th width="560px;">任务详情</th><th width="150px;">备注</th></tr>';
+						var s = '<table  class="tablelist" ><tr><th width="50px;">班次</th><th width="50px;">状态</th><th width="130px;">截止时间</th><th width="50px;">责任人</th><th width="80px;">角色</th><th width="150px;">任务</th><th width="550px;">任务详情</th><th width="140px;">备注</th></tr>';
 						var jsonReturn = eval(data);
 						for (var i = 0; i < jsonReturn.length; i++) {
 							s += '<tr id="'+i+'"><td >' + jsonReturn[i].classId
@@ -79,7 +80,7 @@
 									+ '"/></td><td>' + jsonReturn[i].role
 									+ '</td><td>' + jsonReturn[i].task
 									+ '</td><td title="'+ jsonReturn[i].detail +'">' + jsonReturn[i].detail
-									+ '</td><td><textarea rows="6" cols="20"  title="'+ jsonReturn[i].comment +'">'
+									+ '</td><td><textarea rows="6" cols="19"  title="'+ jsonReturn[i].comment +'">'
 									+ jsonReturn[i].comment
 									+ '</textarea></td></tr>';
 						}
@@ -184,7 +185,9 @@
 		});
 		$("#sureAdd").click(function() {
 			$("#tipAdd").fadeOut(100);
+			var inviter = $.session.get("loggedinuser");
 			var companyName = $("#companyName").val();
+			var industry = $("#industry").val();
 			var name = $("#name").val();
 			var title = $("#title").val();
 			var phoneNumber = $("#phoneNumber").val();
@@ -199,8 +202,10 @@
 				cache : false,
 				async : false,
 				data : JSON.stringify({
+					"inviter" : inviter,
 					"classId" : classId,
 					"companyName" : companyName,
+					"industry" : industry,
 					"name" : name,
 					"title" : title,
 					"phoneNumber" : phoneNumber,
@@ -234,8 +239,8 @@
 			for (k in check_val) {
 				n = check_val[k];
 				classId = $('#' + n + ' td:nth-child(2)').text();
-				name = $('#' + n + ' td:nth-child(4)').text();
-				phoneNumber = $('#' + n + ' td:nth-child(6)').text();
+				name = $('#' + n + ' td:nth-child(6)').text();
+				phoneNumber = $('#' + n + ' td:nth-child(8)').text();
 				$.ajax({
 					type : "DELETE",
 					url : url2,
@@ -266,12 +271,14 @@
 	});
 
 	function notice() {
+		$('#dv').html("");
 		$.session.set("menu", "notice");
-		var s = '<p><b><red>华为PaaS高级培训第五期2018年3月中旬开班，现在启动报名，报名请联系各个合作伙伴对应华为接口人。</red></b></p>';
-		$('#dv').html(s);
 		$("#control").fadeOut(10);
 		$("#forum").fadeOut(10);
 		$("#survey").fadeOut(10);
+		$("#survey").fadeOut(10);
+		$("#notice").fadeIn(10);
+		
 	}
 	function studentShow(current,cal) {
 		var num1;
@@ -295,7 +302,7 @@
 						classId : classIds
 					},
 					success : function(data) {
-						var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>公司</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>备注</th></tr>';
+						var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>邀请人</th><th>公司</th><th>行业</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>邀请理由</th></tr>';
 						var jsonReturn = eval(data);
 						var totalNum = jsonReturn.length;
 						var currentNum = parseInt($.session.get("curStu"));
@@ -323,7 +330,11 @@
 								s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><td >'
 										+ jsonReturn[i].classId
 										+ '</td><td>'
+										+ jsonReturn[i].inviter
+										+ '</td><td>'
 										+ jsonReturn[i].companyName
+										+ '</td><td>'
+										+ jsonReturn[i].industry
 										+ '</td><td>'
 										+ jsonReturn[i].name
 										+ '</td><td>'
@@ -334,9 +345,9 @@
 										+ jsonReturn[i].email
 										+ '</td><td>'
 										+ jsonReturn[i].hwcloudId
-										+ '</td><td><textarea disabled="disabled" rows="3" cols="20">'
+										+ '</td><td>'
 										+ jsonReturn[i].comment
-										+ '</textarea></td></tr>';
+										+ '</td></tr>';
 							}
 						}
 						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'"><br/>';
@@ -344,6 +355,7 @@
 						$('#dv').html(s);
 						$("#control").fadeIn(100);
 						$("#forum").fadeOut(100);
+						$("#notice").fadeOut(10);
 					},
 					error : function(XMLHttpRequest) {
 						commonaction(XMLHttpRequest);
@@ -443,6 +455,7 @@
 						$("#control").fadeOut(100);
 						$("#forum").fadeOut(100);
 						$("#survey").fadeOut(100);
+						$("#notice").fadeOut(10);
 					},
 					error : function(data) {
 						alert("Error!!!");
@@ -569,7 +582,7 @@
 										+ '<span>姓名：' + jsonReturn[i].forumusername + '</span></div></td>'
 										+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'	+ jsonReturn[i].content	+ '</p></div><div class="forumSecond">';
 								if(jsonReturn[i].path !="" ){
-									s+= '<a href="'+jsonReturn[i].path+'" target="_blank">点击打开图片</a>';
+									s+= '<div class="forumSecond"> <a href="'+jsonReturn[i].path+'" target="_blank"><image height="360px" src="'+ jsonReturn[i].path+ '" alt=""/></a></div>';
 								}
 								s+= '</div><div class="forumThird"><span class="date">' + jsonReturn[i].time + '</span></div></td></tr>';
 							}
@@ -580,6 +593,7 @@
 						$("#forum").fadeIn(100);
 						$("#control").fadeOut(100);
 						$("#survey").fadeOut(100);
+						$("#notice").fadeOut(10);
 					},
 					error : function(data) {
 						alert("查询问题失败！");
@@ -587,6 +601,9 @@
 				});
 	}
 	function uploadPic() {
+		$("#uploadButton").val("请等待 图片上传中...");
+		$("#uploadButton").attr("style", "background:#6B6B6B;");
+		$("#uploadButton").attr("disabled", "disabled");
 		var options = {
 			url : "hwtraining-teacher-service/hwtraining/v1/upload",
 			type : "POST",
@@ -594,8 +611,14 @@
 			success : function(data) {
 				console.log(data);
 				$("#allUrl").attr("src", data);
+				$("#uploadButton").attr("disabled", false);
+				$("#uploadButton").attr("style", "background:#E27575;");
+				$("#uploadButton").val("提交");
 			},
 			error : function(data) {
+				$("#uploadButton").attr("disabled", false);
+				$("#uploadButton").attr("style", "background:#E27575;");
+				$("#uploadButton").val("提交");
 				alert("上传图片失败！！！");
 				console.log(data);
 				return;
@@ -719,6 +742,7 @@
 		$('#dv').html("");
 		$("#forum").fadeOut(10);
 		$("#control").fadeOut(10);
+		$("#notice").fadeOut(10);
 		$("#survey").fadeIn(100);
 		dayShow(1);
 	}
@@ -773,13 +797,13 @@
 			}),
 			success : function(data) {
 				alert("感谢您的评价！！！");
-				/* for(var i=1;i<7;i++){
+				for(var i=1;i<7;i++){
 					var radios = document.getElementsByName("day"+day+"0"+i);
 					var len = radios.length;
 					for(var j=0;j<len;j++){
-				       radios[j].attr("checked",false);
+				       radios[j].checked = false;
 					}
-				} */
+				}
 				$("#day"+day+"07").attr("value","");
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
@@ -793,7 +817,7 @@
 		<img src="images/huaweilogo.jpg" style="margin: 0 auto;" alt="wenqi blog" />
 	</div>
 	<div class="menu">
-		<a name="aaa" href="javascript:notice();">华为云PaaS学堂公告</a>
+		<a name="aaa" href="javascript:notice();">华为云学堂公告</a>
 		<a name="aaa" href="javascript:taskShow();">培训流程管理</a>
 		<a name="aaa" href="javascript:studentShow(0,0);">学员报名管理</a>
 		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
@@ -849,6 +873,10 @@
 					    <input type="text" class="dfinput" style="width: 518px;" id="companyName" />
 					</li>
 					<li>
+					    <label>行业描述<b>*</b></label>
+					    <input type="text" class="dfinput" style="width: 518px;" id="industry" />
+					</li>
+					<li>
 					    <label>姓名<b>*</b></label>
 					    <input type="text" class="dfinput" style="width: 518px;" id="name" />
 					</li>
@@ -869,7 +897,7 @@
 					    <input type="text" class="dfinput" style="width: 518px;" id="hwcloudId" />
 					</li>
 					<li>
-					    <label>备注</label>
+					    <label>邀请理由<b>*</b></label>
 					    <input type="text" class="dfinput" style="width: 518px;" id="comment" />
 					</li>
 				</ul>
@@ -933,19 +961,19 @@
 			</tr>
 			<tr>
 				<td>
-				    <input type="button" class="button" onclick="upload()" value="提交" />
+				    <input id="uploadButton" type="button" class="button" onclick="upload()" value="提交" />
 				</td>
 			</tr>
 		</table>
 	</div>
-	<div id="survey">
+	<div  class="surveryStyle" id="survey">
 	    <div class="menu"> 
 		    <a name="bbb" href="javascript:dayShow(1);">Day1</a>
 		    <a name="bbb" href="javascript:dayShow(2);">Day2</a>
 		    <a name="bbb" href="javascript:dayShow(3);">Day3</a>
 	    </div>
 		<div id="surveyHead">
-			<p>您好，感谢您参加此次培训，为使后续的培训能够更好的满足学院的需求，请您花费1分钟，对培训课程给出您的满意度评价。此次问卷为不记名调查，请您放心填写，我们需要您的真实反馈。</p>
+			<p style="font-weight:bold;" >您好，感谢您参加此次培训，为使后续的培训能够更好的满足学院的需求，请您花费1分钟，对培训课程给出您的满意度评价。此次问卷为不记名调查，请您放心填写，我们需要您的真实反馈。</p>
 		</div>
 		<div id="surveyDay1">
 			<p>1、对《深入理解云计算PaaS&华为云PaaS整体解决方案》的满意度<br/>
@@ -991,8 +1019,8 @@
 			<input type="radio" name="day106" value="4"/>4
 			<input type="radio" name="day106" value="5"/>5非常满意</p>
 			<p>7、写下您的宝贵意见<br/>
-			<textarea name="day1" id="day107"></textarea></p>
-			<button onclick="review(1)">提交</button>
+			<textarea name="day1" id="day107" style="width: 800px; height: 100px; background-color:	#F5DEB3; font-size: 11pt;"  ></textarea></p><br/>
+			<button onclick="review(1)"  style="width: 50px; height: 20px; font-size: 12pt;">提交</button>
 		</div>
 		<div id="surveyDay2">
 			<p>1、对课程《企业应用云化Devops（微服务开发、上线、治理）》的满意度<br/>
@@ -1038,8 +1066,8 @@
 			<input type="radio" name="day206" value="4"/>4
 			<input type="radio" name="day206" value="5"/>5非常满意</p>
 			<p>7、写下您的宝贵意见<br/>
-			<textarea name="day2" id="day207"></textarea></p>
-			<button onclick="review(2)">提交</button>
+			<textarea name="day2" id="day207" style="width: 800px; height: 100px; background-color:	#F5DEB3; font-size: 11pt;" ></textarea></p><br/>
+			<button onclick="review(2)" style="width: 50px; height: 20px; font-size: 12pt;">提交</button>
 		</div>
 		<div id="surveyDay3">
 			<p>1、对课程《深入理解华为云EI（企业智能）解决方案》的满意度<br/>
@@ -1085,10 +1113,74 @@
 			<input type="radio" name="day306" value="4"/>4
 			<input type="radio" name="day306" value="5"/>5非常满意</p>
 			<p>7、写下您的宝贵意见<br/>
-			<textarea name="day3" id="day307"></textarea></p>
-			<button onclick="review(3)">提交</button>
+			<textarea name="day3" id="day307" style="width: 800px; height: 100px; background-color:	#F5DEB3; font-size: 11pt;" ></textarea></p><br/>
+			<button onclick="review(3)" style="width: 50px; height: 20px; font-size: 12pt;">提交</button>
 		</div>
 	</div>
+	
+	<div id="notice"  style="display: none;"   class="surveryStyle">
+	<p>各位学员，华为云PaaS&EI培训(班次201803)具体时间是2018年3月13日~3月15日，具体地址是广东省深圳市龙岗区坂田华为基地培训中心（J区）<b style="font-size: 12pt;">J1-3B13R</b>教室。</p><br/>
+    <p>请大家3月13日上午8:30在培训J区的门口接待室签到，会有工作人员负责接待并分发学员证，您领取到学员证之后请妥善保管，后续三天都需凭此证出入培训区域，<b style="font-size: 12pt;color: red">培训结束后务必归还给班主任</b>。</p><br/>
+     <p>三天具体的课程安排如下：</p>
+     <table class="tablelist" style="width: 1050px;">
+  <tr>
+    <th style="text-align: center;width: 50px;">序号</th><th style="text-align: center;width: 650px;">课程</th><th style="text-align: center;width: 70px;">时长</th><th style="text-align: center;width: 90px;">日期</th><th style="text-align: center;width: 100px;">时间</th><th style="text-align: center;width: 100px;">上课方式</th>
+  </tr>
+  <tr>
+    <td style="text-align: center;">0</td><td>课前准备&签到</td><td style="text-align: center;">20Min</td><td rowspan="3">2018-3-13 AM</td><td style="text-align: center;">09:00~09:20</td><td></td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">1</td><td>深入理解云计算PaaS&华为云PaaS整体解决方案</td><td style="text-align: center;">60Min</td><td style="text-align: center;">09:20~10:20</td><td>讲课</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">2</td><td>传统应用如何零修改快捷上云</td><td style="text-align: center;">90Min</td><td style="text-align: center;">10:30~12:00</td><td>演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">3</td><td>掌握云中间件服务</td><td style="text-align: center;">120Min</td><td rowspan="3">2018-3-13 PM</td><td style="text-align: center;">14:00~16:00</td><td>讲课+演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">4</td><td>CCE云容器引擎实现应用快速上线（Docker容器、Kubernetes、CCE容器服务实战, 应用容器化，秒级弹性伸缩）</td><td style="text-align: center;">60Min</td><td style="text-align: center;">16:10~17:10</td><td>讲课</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">5</td><td>经典案例1（云容器）</td><td style="text-align: center;">30Min</td><td style="text-align: center;">17:10~17:40</td><td>演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">6</td><td>企业应用云化DevOps（微服务开发、上线、治理）</td><td style="text-align: center;">120Min</td><td rowspan="2">2018-3-14 PM</td><td style="text-align: center;">09:00~11:00</td><td>讲课+演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">7</td><td>企业应用云化DevOps（微服务运维）</td><td style="text-align: center;">60Min</td><td style="text-align: center;">11:10~12:10</td><td>讲课+演示</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">8</td><td>实战：基于微服务、容器技术构建航空订票系统</td><td style="text-align: center;">210Min</td><td>2018-3-14 PM</td><td style="text-align: center;">14:00~17:30</td><td>综合实战</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">9</td><td>深入理解华为云EI（企业智能）解决方案</td><td style="text-align: center;">70Min</td><td rowspan="3">2018-3-15 AM</td><td style="text-align: center;">09:00~10:10</td><td>讲课+交流</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">10</td><td>掌握华为云EI大数据平台服务（DIS、MRS）</td><td style="text-align: center;">40Min</td><td style="text-align: center;">10:20~11:00</td><td>讲课</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">11</td><td>实战：基于大数据实现车联网车主驾驶行为分析</td><td style="text-align: center;">60Min</td><td style="text-align: center;">11:00~12:00</td><td>演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">12</td><td>掌握华为云EI人工智能基础平台服务（MLS）</td><td style="text-align: center;">60Min</td><td rowspan="3">2018-3-15 PM</td><td style="text-align: center;">14:00~15:00</td><td>讲课</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">13</td><td>实战：基于机器学习实现银行理财产品推荐</td><td style="text-align: center;">60Min</td><td style="text-align: center;">15:00~16:00</td><td>演示+实践</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">14</td><td>华为云EI视觉服务实战</td><td style="text-align: center;">80Min</td><td style="text-align: center;">16:10~17:30</td><td>讲课+交流+实践</td>
+  </tr>
+  
+</table>
+<br/>
+<p>培训的课程资料可先预习，点击下载 <a style="float: none; display:inline; font-size: 11pt; color: blue;" href="https://paas-training.obs.myhwclouds.com/HUAWEI-Training-Textbook.zip" target="_blank">培训资料</a>； 由于此次培训涉及到实践演练，请提前申请好<a style="float: none; display:inline; font-size: 11pt;color: blue;" href="https://www.huaweicloud.com" target="_blank">华为云</a>账号、完成实名认证、做好预充值。</p><br/>
+<p><b style="font-size: 12pt;">温馨提示：</b><br/></p>
+<p>
+    * 记得携带笔记本电脑前来培训。<br/>
+    * 如有任何问题可添加华为云PaaS助手（微信号：hwpaas）或联系 田老师 18676650542/刘老师 18850208032 。
+</p>
+	</div>	
 	<div id="dv"></div>
 </body>
 
