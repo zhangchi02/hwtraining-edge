@@ -23,6 +23,7 @@
     	else return temp;
     }
     var classId;
+	var loggedinuser;
     function getClassId(){
 	    url = "hwtraining-teacher-service/hwtraining/v1/currentclassid";
 	    $.ajax({
@@ -161,8 +162,11 @@
 				this.style= "background-position:left -56px;";
 			};
 		}
+		var defaultMenu = $("#"+$.session.get("menu"));
 		$.session.set("curStu", 1);
 		$.session.set("curForum", 1);
+		
+		loggedinuser = $.session.get("loggedinuser");
 		if(isLogin()){
 			$("#option").fadeIn(100);
 		}
@@ -672,7 +676,6 @@
 			}
 		});
 	}
-	var loggedinuser;
 	function login() {
 		var username = $("#username").val();
 		var password = $("#password").val();
@@ -822,12 +825,12 @@
 		<img src="images/huaweilogo.jpg" style="margin: 0 auto;" alt="wenqi blog" />
 	</div>
 	<div class="menu">
-		<a name="aaa" href="javascript:notice();">华为云学堂公告</a>
-		<a name="aaa" href="javascript:taskShow();">培训流程管理</a>
-		<a name="aaa" href="javascript:studentShow(0,0);">学员报名管理</a>
-		<a name="aaa" href="javascript:scoreShow();">学员成绩管理</a>
-		<a name="aaa" href="javascript:forumShow(0,0);">产品问题管理</a>
-		<a name="aaa" href="javascript:surveyShow();">课程反馈</a>
+		<a name="aaa" id="noticeShow" href="javascript:notice();">华为云学堂公告</a>
+		<a name="aaa" id="taskShow" href="javascript:taskShow();">培训流程管理</a>
+		<a name="aaa" id="studentShow" href="javascript:studentShow(0,0);">学员报名管理</a>
+		<a name="aaa" id="scoreShow" href="javascript:scoreShow();">学员成绩管理</a>
+		<a name="aaa" id="forumShow" href="javascript:forumShow(0,0);">产品问题管理</a>
+		<a name="aaa" id="surveyShow" href="javascript:surveyShow();">课程反馈</a>
 		<div id="option" class="vocation" style="display: none;">
 		         班次：
 		    <select id="classId" onchange="selectOpt()">
