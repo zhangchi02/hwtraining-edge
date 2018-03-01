@@ -672,6 +672,7 @@
 			}
 		});
 	}
+	var loggedinuser;
 	function login() {
 		var username = $("#username").val();
 		var password = $("#password").val();
@@ -688,17 +689,20 @@
 				password : password
 			}),
 			success : function(data) {
-				$.session.set('loggedinuser', username ,true);
 				$('#dv').html();
 				$("#dialog").fadeOut(100);
 				$("#option").fadeIn(100);
-				taskShow();
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				console.log(XMLHttpRequest.status);
 				console.log(XMLHttpRequest.readyState);
 				console.log(textStatus);
 			},
+		    complete: function( XMLHttpRequest,data ){
+		        loggedinuser=XMLHttpRequest.getResponseHeader('loggedinuser');
+				$.session.set('loggedinuser', loggedinuser ,true);
+				taskShow();
+		    }
 		});
 	}
 	function logout() {
@@ -728,7 +732,7 @@
 	}
 
 	function isLogin() {
-		if ($.session.get("loggedinuser") == ""||typeof($.session.get("loggedinuser")) == "undefined") {
+		if ($.session.get("loggedinuser") == ""||typeof($.session.get("loggedinuser")) == "undefined"||$.session.get("loggedinuser")!=loggedinuser) {
 			$("#logout").fadeOut(100);
 			$("#dialog").fadeIn(100);
 			return false;
