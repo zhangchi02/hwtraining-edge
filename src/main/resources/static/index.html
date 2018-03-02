@@ -24,6 +24,8 @@
     }
     var classId;
 	var loggedinuser;
+	var divs;
+	var divsb;
     function getClassId(){
 	    url = "hwtraining-teacher-service/hwtraining/v1/currentclassid";
 	    $.ajax({
@@ -142,7 +144,7 @@
 	$(document).ready(function() {
 		getClassId();
 		$("#classId").val(classId);
-		var divs = document.getElementsByName("aaa");
+		divs = document.getElementsByName("aaa");
 		var len = divs.length;
 		for(var i=0;i<len;i++){
 			divs[i].onclick = function(){
@@ -152,7 +154,7 @@
 				this.style= "background-position:left -56px;";
 			};
 		}
-		var divsb = document.getElementsByName("bbb");
+		divsb = document.getElementsByName("bbb");
 		var lenb = divsb.length;
 		for(var i=0;i<lenb;i++){
 			divsb[i].onclick = function(){
@@ -162,14 +164,37 @@
 				this.style= "background-position:left -56px;";
 			};
 		}
-		var defaultMenu = $("#"+$.session.get("menu"));
+		notice();
+		var m = $.session.get("menu");
+		var defaultMenu = $("#"+m+"Show");
+		for(var i=0;i<len;i++){
+			var con = divs[i].text;
+			var label = defaultMenu.text();
+			divs[i].style = "";
+			if( con == label){
+				divs[i].style= "background-position:left -56px;";
+			}
+		}
+		$.session.set("day", 1);
+		/* if("" == d || "undefined" == typeof(d)){
+			d=1;
+		} */
+		var d = $.session.get("day");
+		var defaultDay = $("#day"+d);
+		for(var i=0;i<lenb;i++){
+			var con = divsb[i].text;
+			var label = defaultDay.text();
+			divsb[i].style = "";
+			if( con == label){
+				divsb[i].style= "background-position:left -56px;";
+			}
+		}
 		$.session.set("curStu", 1);
 		$.session.set("curForum", 1);
 		login();
 		if(isLogin()){
 			$("#option").fadeIn(100);
 		}
-		notice();
 		$("#clickAdd").click(function() {
 			var classIds = $("#classId").find("option:selected").val();
 			getClassId();
@@ -684,7 +709,7 @@
 		if("" == password || "undefined" == typeof(password)){
 		    password = $("#password").val();
 		}
-		var url = "hwtraining-teacher-service/hwtraining/v1/login"
+		var url = "hwtraining-teacher-service/hwtraining/v1/login";
 		$.ajax({
 			url : url,
 			type : "POST",
@@ -707,6 +732,8 @@
 				console.log(XMLHttpRequest.status);
 				console.log(XMLHttpRequest.readyState);
 				console.log(textStatus);
+				$.session.set('username', "");
+				$.session.set('password', "");
 			},
 		    complete: function( XMLHttpRequest,data ){
 		        loggedinuser=XMLHttpRequest.getResponseHeader('loggedinuser');
@@ -761,23 +788,27 @@
 		$("#control").fadeOut(10);
 		$("#notice").fadeOut(10);
 		$("#survey").fadeIn(100);
-		dayShow(1);
+		var day = $.session.get("day");
+		dayShow(day);
 	}
 	function dayShow(day){
 		if(day==1){
 		    $("#surveyDay1").fadeIn(10);
 		    $("#surveyDay2").fadeOut(10);
 		    $("#surveyDay3").fadeOut(10);
+		    $.session.set("day", 1);
 		}
 		if(day==2){
 		    $("#surveyDay2").fadeIn(10);
 		    $("#surveyDay1").fadeOut(10);
 		    $("#surveyDay3").fadeOut(10);
+		    $.session.set("day", 2);
 		}
 		if(day==3){
 		    $("#surveyDay3").fadeIn(10);
 		    $("#surveyDay1").fadeOut(10);
 		    $("#surveyDay2").fadeOut(10);
+		    $.session.set("day", 3);
 		}
 	}
 	function review(day){
@@ -985,22 +1016,22 @@
 	</div>
 	<div  class="surveryStyle" id="survey">
 	    <div class="menu"> 
-		    <a name="bbb" href="javascript:dayShow(1);">Day1</a>
-		    <a name="bbb" href="javascript:dayShow(2);">Day2</a>
-		    <a name="bbb" href="javascript:dayShow(3);">Day3</a>
+		    <a name="bbb" id="day1" href="javascript:dayShow(1);">Day1</a>
+		    <a name="bbb" id="day2" href="javascript:dayShow(2);">Day2</a>
+		    <a name="bbb" id="day3" href="javascript:dayShow(3);">Day3</a>
 	    </div>
 		<div id="surveyHead">
 			<p style="font-weight:bold;" >您好，感谢您参加此次培训，为使后续的培训能够更好的满足学院的需求，请您花费1分钟，对培训课程给出您的满意度评价。此次问卷为不记名调查，请您放心填写，我们需要您的真实反馈。</p>
 		</div>
 		<div id="surveyDay1">
-			<p>1、对《深入理解云计算PaaS&华为云PaaS整体解决方案》的满意度<br/>
+			<p>1、对《深入理解云计算PaaS&amp;华为云PaaS整体解决方案》的满意度<br/>
 			非常不满意
 			<input type="radio" name="day101" value="1"/>1
 			<input type="radio" name="day101" value="2"/>2
 			<input type="radio" name="day101" value="3"/>3
 			<input type="radio" name="day101" value="4"/>4
 			<input type="radio" name="day101" value="5"/>5非常满意</p>
-			<p>2、《深入理解云计算PaaS&华为云PaaS整体解决方案》的课程讲师表达清晰，重点突出<br/>
+			<p>2、《深入理解云计算PaaS&amp;华为云PaaS整体解决方案》的课程讲师表达清晰，重点突出<br/>
 			非常不满意
 			<input type="radio" name="day102" value="1"/>1
 			<input type="radio" name="day102" value="2"/>2
@@ -1136,7 +1167,7 @@
 	</div>
 	
 	<div id="notice"  style="display: none;"   class="surveryStyle">
-	<p>各位学员，华为云PaaS&EI培训(班次201803)具体时间是2018年3月13日~3月15日，具体地址是广东省深圳市龙岗区坂田华为基地培训中心（J区）<b style="font-size: 12pt;">J1-3B13R</b>教室。</p><br/>
+	<p>各位学员，华为云PaaS&amp;EI培训(班次201803)具体时间是2018年3月13日~3月15日，具体地址是广东省深圳市龙岗区坂田华为基地培训中心（J区）<b style="font-size: 12pt;">J1-3B13R</b>教室。</p><br/>
     <p>请大家3月13日上午8:30在培训J区的门口接待室签到，会有工作人员负责接待并分发学员证，您领取到学员证之后请妥善保管，后续三天都需凭此证出入培训区域，<b style="font-size: 12pt;color: red">培训结束后务必归还给班主任</b>。</p><br/>
      <p>三天具体的课程安排如下：</p>
      <table class="tablelist" style="width: 1050px;">
@@ -1144,10 +1175,10 @@
     <th style="text-align: center;width: 50px;">序号</th><th style="text-align: center;width: 650px;">课程</th><th style="text-align: center;width: 70px;">时长</th><th style="text-align: center;width: 90px;">日期</th><th style="text-align: center;width: 100px;">时间</th><th style="text-align: center;width: 100px;">上课方式</th>
   </tr>
   <tr>
-    <td style="text-align: center;">0</td><td>课前准备&签到</td><td style="text-align: center;">20Min</td><td rowspan="3">2018-3-13 AM</td><td style="text-align: center;">09:00~09:20</td><td></td>
+    <td style="text-align: center;">0</td><td>课前准备&amp;签到</td><td style="text-align: center;">20Min</td><td rowspan="3">2018-3-13 AM</td><td style="text-align: center;">09:00~09:20</td><td></td>
   </tr>
   <tr>
-    <td style="text-align: center;">1</td><td>深入理解云计算PaaS&华为云PaaS整体解决方案</td><td style="text-align: center;">60Min</td><td style="text-align: center;">09:20~10:20</td><td>讲课</td>
+    <td style="text-align: center;">1</td><td>深入理解云计算PaaS&amp;华为云PaaS整体解决方案</td><td style="text-align: center;">60Min</td><td style="text-align: center;">09:20~10:20</td><td>讲课</td>
   </tr>
   <tr>
     <td style="text-align: center;">2</td><td>传统应用如何零修改快捷上云</td><td style="text-align: center;">90Min</td><td style="text-align: center;">10:30~12:00</td><td>演示+实践</td>
