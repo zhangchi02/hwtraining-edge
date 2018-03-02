@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>华为云PaaS&EI学堂</title>
+<title>华为云PaaS&amp;EI学堂</title>
 <link href="css/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery-form.js"></script>
@@ -165,8 +165,7 @@
 		var defaultMenu = $("#"+$.session.get("menu"));
 		$.session.set("curStu", 1);
 		$.session.set("curForum", 1);
-		
-		loggedinuser = $.session.get("loggedinuser");
+		login();
 		if(isLogin()){
 			$("#option").fadeIn(100);
 		}
@@ -677,8 +676,14 @@
 		});
 	}
 	function login() {
-		var username = $("#username").val();
-		var password = $("#password").val();
+		var username = $.session.get("username");
+		if("" == username || "undefined" == typeof(username)){
+			username = $("#username").val();
+		}
+		var password = $.session.get("password");
+		if("" == password || "undefined" == typeof(password)){
+		    password = $("#password").val();
+		}
 		var url = "hwtraining-teacher-service/hwtraining/v1/login"
 		$.ajax({
 			url : url,
@@ -695,6 +700,8 @@
 				$('#dv').html();
 				$("#dialog").fadeOut(100);
 				$("#option").fadeIn(100);
+				$.session.set('username', username, true);
+				$.session.set('password', password, true);
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				console.log(XMLHttpRequest.status);
@@ -703,7 +710,7 @@
 			},
 		    complete: function( XMLHttpRequest,data ){
 		        loggedinuser=XMLHttpRequest.getResponseHeader('loggedinuser');
-				$.session.set('loggedinuser', loggedinuser ,true);
+				$.session.set('loggedinuser', loggedinuser,true);
 				taskShow();
 		    }
 		});
@@ -724,6 +731,8 @@
 			},
 		});
 		$.session.set("loggedinuser", "");
+		$.session.set("username", "");
+		$.session.set("password", "");
 	}
 
 	function commonaction(XMLHttpRequest) {
