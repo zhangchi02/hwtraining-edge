@@ -701,6 +701,7 @@
 		});
 	}
 	function login() {
+		var m = $.session.get("menu");
 		var username = $.session.get("username");
 		if("" == username || "undefined" == typeof(username)){
 			username = $("#username").val();
@@ -724,9 +725,21 @@
 			success : function(data) {
 				$('#dv').html();
 				$("#dialog").fadeOut(100);
+				$("#logout").fadeIn(100);
 				$("#option").fadeIn(100);
 				$.session.set('username', username, true);
 				$.session.set('password', password, true);
+				
+				var len = divs.length;
+				var defaultMenu = $("#"+m+"Show");
+				for(var i=0;i<len;i++){
+					var con = divs[i].text;
+					var label = defaultMenu.text();
+					divs[i].style = "";
+					if( con == label){
+						divs[i].style= "background-position:left -56px;";
+					}
+				}
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				console.log(XMLHttpRequest.status);
@@ -738,7 +751,7 @@
 		    complete: function( XMLHttpRequest,data ){
 		        loggedinuser=XMLHttpRequest.getResponseHeader('loggedinuser');
 				$.session.set('loggedinuser', loggedinuser,true);
-				taskShow();
+				selectOpt();
 		    }
 		});
 	}
