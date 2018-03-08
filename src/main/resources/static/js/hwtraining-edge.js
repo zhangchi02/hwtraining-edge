@@ -331,7 +331,7 @@ var t = new Date();
 						classId : classIds
 					},
 					success : function(data) {
-						var s = '<table  class="tablelist" ><tr><th><input type="checkbox"></th><th>班次</th><th>邀请人</th><th>公司</th><th>行业</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>邀请理由</th></tr>';
+						var s = '<table  class="tablelist" ><tr><th width="30px;"><input type="checkbox"></th><th width="50px;">班次</th><th width="90px;">邀请人</th><th width="180px;">公司</th><th width="120px;">行业</th><th width="60px;">姓名</th><th width="105px;">岗位</th><th width="85px;">手机号</th><th width="160px;">邮箱</th><th width="100px;">公有云账户</th><th width="219px;">邀请理由</th></tr>';
 						var jsonReturn = eval(data);
 						var totalNum = jsonReturn.length;
 						var currentNum = parseInt($.session.get("curStu"));
