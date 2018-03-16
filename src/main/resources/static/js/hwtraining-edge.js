@@ -102,14 +102,14 @@ var t = new Date();
 	}
 	function changeStatus(id) {
 		classId = $('#' + id + ' td:nth-child(1)').text();
-		task = $('#' + id + ' td:nth-child(6)').text();
-		handPeople = $('#' + id + ' td:nth-child input[type="text"]').val();
+		var task = $('#' + id + ' td:nth-child(6)').text();
+		var handPeople = $('#' + id + ' td:nth-child input[type="text"]').val();
 		if(handPeople==""||typeof(handPeople)=="undefined"){
 			$("#" + id + " td:nth-child input[type='text'] ").attr("style", "background:#FF6161;");
 			$("#" + id + " td:nth-child input[type='text'] ").focus();
 			return;
 		}
-		comment = $('#' + id + ' td:nth-child(8) textarea').val();
+		var comment = $('#' + id + ' td:nth-child(8) textarea').val();
 		url2 = "hwtraining-teacher-service/hwtraining/v1/tasks";
 		$.ajax({
 			type : "PUT",
@@ -166,9 +166,6 @@ var t = new Date();
 			}
 		}
 		$.session.set("day", 1);
-		/* if("" == d || "undefined" == typeof(d)){
-			d=1;
-		} */
 		var d = $.session.get("day");
 		var defaultDay = $("#day"+d);
 		for(var i=0;i<lenb;i++){
@@ -192,15 +189,60 @@ var t = new Date();
 				alert("请切换到正确的班次："+classId+"！！！");
 				return;
 			}
+			$("#companyName").val("");
+			$("#industry").val("");
+			$("#name").val("");
+			$("#title").val("");
+			$("#phoneNumber").val("");
+			$("#email").val("");
+			$("#hwcloudId").val("");
+			$("#comment").val("");
 			$("#tipAdd").fadeIn(200);
 		});
 		$("#clickUpdate").click(function() {
-			var classIds = $("#classId").find("option:selected").val();
-			getClassId();
-			if(classIds!=classId){
-				alert("请切换到正确的班次："+classId+"！！！");
-				return;
+			var obj = document.getElementsByName("student");
+			var check_val = [];
+			for (k in obj) {
+				if (obj[k].checked)
+					check_val.push(obj[k].value);
 			}
+			if(check_val.length<1){
+				alert("请选择要修改的选项！！！");
+				return false;
+			}
+			if(check_val.length>1){
+				alert("只能选择一个要修改的选项！！！");
+				return false;
+			}
+			var url2 = "hwtraining-teacher-service/hwtraining/v1/student";
+			var n = check_val[0];
+			var studentId = $('#' + n + ' td:nth-child(1) input[type="hidden"]').val();
+			$.ajax({
+				type : "GET",
+				url : url2,
+				dataType : "json",
+				cache : false,
+				async : false,
+				data : {
+					studentId: studentId
+				},
+				success : function(data) {
+					var jsonReturn = eval(data);
+					$("#companyName").val(jsonReturn[0].companyName);
+					$("#industry").val(jsonReturn[0].industry);
+					$("#name").val(jsonReturn[0].name);
+					$("#title").val(jsonReturn[0].title);
+					$("#phoneNumber").val(jsonReturn[0].phoneNumber);
+					$("#email").val(jsonReturn[0].email);
+					$("#hwcloudId").val(jsonReturn[0].hwcloudId);
+					$("#comment").val(jsonReturn[0].comment);
+					$("#studentId").val(jsonReturn[0].studentId);
+				},
+				error : function(data) {
+					alert("Error!!!");
+					return;
+				}
+			});
 			$("#tipAdd").fadeIn(200);
 		});
 		
@@ -213,6 +255,7 @@ var t = new Date();
 		});
 		$("#sureAdd").click(function() {
 			$("#tipAdd").fadeOut(100);
+			var studentId = $("#studentId").val();
 			var inviter = $.session.get("loggedinuser");
 			var companyName = $("#companyName").val();
 			var industry = $("#industry").val();
@@ -239,7 +282,8 @@ var t = new Date();
 					"phoneNumber" : phoneNumber,
 					"email" : email,
 					"hwcloudId" : hwcloudId,
-					"comment" : comment
+					"comment" : comment,
+					"studentId": studentId
 				}),
 				success : function(data) {
 					if (data == true) {
@@ -257,15 +301,16 @@ var t = new Date();
 		});
 		$("#sureDelete").click(function() {
 			$("#tipDelete").fadeOut(100);
-			obj = document.getElementsByName("student");
-			check_val = [];
+			var obj = document.getElementsByName("student");
+			var check_val = [];
 			for (k in obj) {
 				if (obj[k].checked)
 					check_val.push(obj[k].value);
 			}
-			url2 = "hwtraining-teacher-service/hwtraining/v1/student";
+			var url2 = "hwtraining-teacher-service/hwtraining/v1/student";
 			for (k in check_val) {
 				n = check_val[k];
+				studentId = $('#' + n + ' td:nth-child(1) input[type="hidden"]').val();
 				classId = $('#' + n + ' td:nth-child(2)').text();
 				name = $('#' + n + ' td:nth-child(6)').text();
 				phoneNumber = $('#' + n + ' td:nth-child(8)').text();
@@ -278,7 +323,8 @@ var t = new Date();
 					data : {
 						classId : classId,
 						name : name,
-						phoneNumber : phoneNumber
+						phoneNumber : phoneNumber,
+						studentId: studentId
 					},
 					success : function(data) {
 						if((parseInt(k)+1)==check_val.length){
@@ -356,7 +402,7 @@ var t = new Date();
 						num2 = currentNum * 10;
 						for (var i = 0; i < jsonReturn.length; i++) {
 							if(i>=num1 && i<num2){
-								s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><td >'
+								s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><input type="hidden" value="'+jsonReturn[i].studentId+'"/></td><td >'
 										+ jsonReturn[i].classId
 										+ '</td><td>'
 										+ jsonReturn[i].inviter
