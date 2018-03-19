@@ -249,6 +249,9 @@ var t = new Date();
 		$("#clickDelete").click(function() {
 			$("#tipDelete").fadeIn(200);
 		});
+		$("#clickImport").click(function() {
+			$("#tipImport").fadeIn(200);
+		});
 		$(".tiptop a").click(function() {
 			$(".tip").fadeOut(200);
 			$(".tipDelete").fadeOut(200);
@@ -338,9 +341,31 @@ var t = new Date();
 				});
 			}
 		});
+		$("#sureImport").click(function() {
+			$("#tipImport").fadeOut(100);
+			var options = {
+					url : "hwtraining-teacher-service/hwtraining/v1/import",
+					type : "POST",
+					dataType : "json",
+					cache : false,
+					async : false,
+					success : function(data) {
+						console.log(data);
+						alert("导入成功！！！");
+					},
+					error : function(data) {
+						console.log(data);
+						alert("导入失败！！！");
+					}
+			};
+			$("#importForm").ajaxSubmit(options);
+			$("#import").val("");
+			studentShow(0,0);
+		});
 		$(".cancel").click(function() {
 			$(".tip").fadeOut(100);
 			$(".tipDelete").fadeOut(100);
+			$(".tipImport").fadeOut(100);
 		});
 	});
 
