@@ -379,87 +379,85 @@ var t = new Date();
 		$("#notice").fadeIn(10);
 		
 	}
-	function studentShow(current,cal) {
-		var num1;
-		var num2;
+	var jsonReturn;
+	function getStudents(){
 		var classIds = $("#classId").find("option:selected").val();
-		//console.log("curStu类型：",typeof(current),"cal类型：",typeof(cal));
-		$.session.set("menu", "student");
-		isLogin();
-		$("#control").fadeOut(10);
-		$("#survey").fadeOut(10);
-		$("#notice").fadeOut(10);
 		url = "hwtraining-teacher-service/hwtraining/v1/students";
-		$
-				.ajax({
-					type : "GET",
-					url : url,
-					contentType : "application/json",
-					dataType : "json",
-					cache : false,
-					async : false,
-					data : {
-						classId : classIds
-					},
-					success : function(data) {
-						var s = '<table  class="tablelist" ><tr><th width="30px;"><input type="checkbox"></th><th width="50px;">班次</th><th width="90px;">邀请人</th><th width="180px;">公司</th><th width="120px;">行业</th><th width="60px;">姓名</th><th width="105px;">岗位</th><th width="85px;">手机号</th><th width="160px;">邮箱</th><th width="100px;">公有云账户</th><th width="219px;">邀请理由</th></tr>';
-						var jsonReturn = eval(data);
-						var totalNum = jsonReturn.length;
-						var currentNum = parseInt($.session.get("curStu"));
-						var totalPage = Math.ceil(totalNum/10);
-						if(cal != 0){
-							currentNum+=cal;
-							if(currentNum==0){
-								currentNum = 1;
-							}
-						}
-						if(current != 0){
-							currentNum = current;
-						}
-						if(cal==0 && current==0){
-							currentNum = 1;
-						}
-						if(totalNum == 0){
-							totalPage =1;
-						}
-						$.session.set("curStu", currentNum);
-						num1 = (currentNum-1) * 10;
-						num2 = currentNum * 10;
-						for (var i = 0; i < jsonReturn.length; i++) {
-							if(i>=num1 && i<num2){
-								s += '<tr id="'+i+'"><td><input name="student" type="checkbox" value="'+i+'"/><input type="hidden" value="'+jsonReturn[i].studentId+'"/></td><td >'
-										+ jsonReturn[i].classId
-										+ '</td><td>'
-										+ jsonReturn[i].inviter
-										+ '</td><td>'
-										+ jsonReturn[i].companyName
-										+ '</td><td>'
-										+ jsonReturn[i].industry
-										+ '</td><td>'
-										+ jsonReturn[i].name
-										+ '</td><td>'
-										+ jsonReturn[i].title
-										+ '</td><td>'
-										+ jsonReturn[i].phoneNumber
-										+ '</td><td>'
-										+ jsonReturn[i].email
-										+ '</td><td>'
-										+ jsonReturn[i].hwcloudId
-										+ '</td><td>'
-										+ jsonReturn[i].comment
-										+ '</td></tr>';
-							}
-						}
-						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'"><br/>';
-						s += '<a onclick="studentShow(1,0);">首页</a><a onclick="studentShow(0,-1);">上一页</a><a onclick="studentShow(0,1);">下一页</a><a onclick="studentShow('+totalPage+',0);">尾页</a> 总条数：'+totalNum;
-						$('#dv').html(s);
-						$("#control").fadeIn(100);
-						$("#forum").fadeOut(100);
-					},
-					error : function(XMLHttpRequest) {
-						commonaction(XMLHttpRequest);
-					}
-				});
+		$.ajax({
+			type : "GET",
+			url : url,
+			contentType : "application/json",
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {
+				classId : classIds
+			},
+			success : function(data) {
+				jsonReturn = eval(data);
+			},
+			error : function(XMLHttpRequest) {
+				commonaction(XMLHttpRequest);
+			}
+		});
+	}
+	function studentShow(current,cal) {
+		getStudents();
+		var num1;
+	    var num2;
+	    var classIds = $("#classId").find("option:selected").val();
+	    $.session.set("menu", "student");
+	    isLogin();
+	    $("#control").fadeOut(10);
+	    $("#survey").fadeOut(10);
+	    $("#notice").fadeOut(10);
+	    var s = '<table id="studentTable" class="tablelist" ><tr><th width="30px;"><input type="checkbox"></th><th width="50px;">班次</th><th width="90px;">邀请人</th><th width="180px;">公司</th><th width="120px;">行业</th><th width="60px;">姓名</th><th width="105px;">岗位</th><th width="85px;">手机号</th><th width="160px;">邮箱</th><th width="100px;">公有云账户</th><th width="219px;">邀请理由</th></tr>';
+	    var totalNum = jsonReturn.length;
+	    var currentNum = parseInt($.session.get("curStu"));
+	    var totalPage = Math.ceil(totalNum / 10);
+	    if (cal != 0) {
+	    	currentNum += cal;
+	    	if (currentNum == 0) {
+	    		currentNum = 1;
+	    	}
+	    }
+	    if (current != 0) {
+	    	currentNum = current;
+	    }
+	    if (cal == 0 && current == 0) {
+	    	currentNum = 1;
+	    }
+	    if (totalNum == 0) {
+	    	totalPage = 1;
+	    }
+	    $.session.set("curStu", currentNum);
+	    num1 = (currentNum - 1) * 10;
+	    num2 = currentNum * 10;
+	    for (var i = 0; i < jsonReturn.length; i++) {
+	    	if (i >= num1 && i < num2) {
+	    		s += '<tr id="' + i
+	    				+ '"><td><input name="student" type="checkbox" value="' + i
+	    				+ '"/><input type="hidden" value="'
+	    				+ jsonReturn[i].studentId + '"/></td><td >'
+	    				+ jsonReturn[i].classId + '</td><td>'
+	    				+ jsonReturn[i].inviter + '</td><td>'
+	    				+ jsonReturn[i].companyName + '</td><td>'
+	    				+ jsonReturn[i].industry + '</td><td>' 
+	    				+ jsonReturn[i].name + '</td><td>' 
+	    				+ jsonReturn[i].title + '</td><td>'
+	    				+ jsonReturn[i].phoneNumber + '</td><td>'
+	    				+ jsonReturn[i].email + '</td><td>'
+	    				+ jsonReturn[i].hwcloudId + '</td><td>'
+	    				+ jsonReturn[i].comment + '</td></tr>';
+	    	}
+	    }
+	    s += '</table><input type="hidden" id="taskslist" value="'
+	    		+ jsonReturn.length + '"><br/>';
+	    s += '<a onclick="studentShow(1,0);">首页</a><a onclick="studentShow(0,-1);">上一页</a><a onclick="studentShow(0,1);">下一页</a><a onclick="studentShow('
+	    		+ totalPage + ',0);">尾页</a> 总条数：' + totalNum;
+	    $('#dv').html(s);
+	    $("#control").fadeIn(100);
+	    $("#forum").fadeOut(100);
 	}
 	function scoreShow() {
 		$.session.set("menu", "score");
@@ -943,3 +941,94 @@ var t = new Date();
 			},
 		});
 	}
+	var idTmr;
+    function  getExplorer() {
+        var explorer = window.navigator.userAgent ;
+        //ie
+        if (explorer.indexOf("MSIE") >= 0) {
+            return 'ie';
+        }
+        //firefox
+        else if (explorer.indexOf("Firefox") >= 0) {
+            return 'Firefox';
+        }
+        //Chrome
+        else if(explorer.indexOf("Chrome") >= 0){
+            return 'Chrome';
+        }
+        //Opera
+        else if(explorer.indexOf("Opera") >= 0){
+            return 'Opera';
+        }
+        //Safari
+        else if(explorer.indexOf("Safari") >= 0){
+            return 'Safari';
+        }
+    }
+    function method5(tableid) {
+    	var s = '<table id="exportTable"><tr><th>班次</th><th>邀请人</th><th>公司</th><th>行业</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>邀请理由</th></tr>';
+	    for (var i = 0; i < jsonReturn.length; i++) {
+		    s += '<tr id="' + i
+				+ '"><td >' + jsonReturn[i].classId + '</td><td>'
+				+ jsonReturn[i].inviter + '</td><td>'
+				+ jsonReturn[i].companyName + '</td><td>'
+				+ jsonReturn[i].industry + '</td><td>' + jsonReturn[i].name
+				+ '</td><td>' + jsonReturn[i].title + '</td><td>'
+				+ jsonReturn[i].phoneNumber + '</td><td>' + jsonReturn[i].email
+				+ '</td><td>' + jsonReturn[i].hwcloudId + '</td><td>'
+				+ jsonReturn[i].comment + '</td></tr>';
+	    }
+	    s += '</table>';
+	    $('#exportExcel').html(s);
+	    
+        if(getExplorer()=='ie'){
+            var curTbl = document.getElementById(tableid);
+            var oXL = new ActiveXObject("Excel.Application");
+            var oWB = oXL.Workbooks.Add();
+            var xlsheet = oWB.Worksheets(1);
+            var sel = document.body.createTextRange();
+            sel.moveToElementText(curTbl);
+            sel.select();
+            sel.execCommand("Copy");
+            xlsheet.Paste();
+            oXL.Visible = true;
+
+            try {
+                var fname = oXL.Application.GetSaveAsFilename("Excel.xls", "Excel Spreadsheets (*.xls), *.xls");
+            } catch (e) {
+                print("Nested catch caught " + e);
+            } finally {
+                oWB.SaveAs(fname);
+                oWB.Close(savechanges = false);
+                oXL.Quit();
+                oXL = null;
+                idTmr = window.setInterval("Cleanup();", 1);
+            }
+        } else {
+            tableToExcel(tableid)
+        }
+        $('#exportExcel').html("");
+    }
+    function Cleanup() {
+        window.clearInterval(idTmr);
+        CollectGarbage();
+    }
+    var tableToExcel = (function() {
+	var uri = 'data:application/vnd.ms-excel;base64,', template = '<html><head><meta charset="UTF-8"></head><body><table>{table}</table></body></html>', base64 = function(
+			s) {
+		return window.btoa(unescape(encodeURIComponent(s)))
+	}, format = function(s, c) {
+		return s.replace(/{(\w+)}/g, function(m, p) {
+			return c[p];
+		})
+	}
+	return function(table, name) {
+		if (!table.nodeType)
+			table = document.getElementById(table)
+		var ctx = {
+			worksheet : name || 'Worksheet',
+			table : table.innerHTML
+		}
+		window.location.href = uri + base64(format(template, ctx))
+	}
+    })()
