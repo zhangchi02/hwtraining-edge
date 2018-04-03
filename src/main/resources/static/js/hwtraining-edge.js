@@ -629,75 +629,95 @@ var t = new Date();
 		$(id).children("input").attr("disabled", false);
 		$(id).children("input").focus();
 	}
-	function forumShow(current,cal) {
-		var num1;
-		var num2;
-		$.session.set("menu", "forum");
+	var forumJson;
+	function getForums() {
 		var classIds = $("#classId").find("option:selected").val();
-		isLogin();
-		var cid = classIds;
 		url = "hwtraining-teacher-service/hwtraining/v1/forumcontent";
-		$
-				.ajax({
-					type : "GET",
-					url : url,
-					dataType : "json",
-					cache : false,
-					async : false,
-					data : {
-						classId : cid
-					},
-					success : function(data) {
-						var s = '<table class="forumTable" >';
-						var jsonReturn = eval(data);
-						var totalNum = jsonReturn.length;
-						var currentNum = parseInt($.session.get("curForum"));
-						var totalPage = Math.ceil(totalNum/10);
-						if(cal != 0){
-							currentNum+=cal;
-							if(currentNum==0){
-								currentNum = 1;
-							}
-						}
-						if(current != 0){
-							currentNum = current;
-						}
-						if(cal==0 && current==0){
-							currentNum = 1;
-						}
-						if(totalNum == 0){
-							totalPage =1;
-						}
-						$.session.set("curForum", currentNum);
-						num1 = (currentNum-1) * 10;
-						num2 = currentNum * 10;
-						for (var i = 0; i < jsonReturn.length; i++) {
-							if(i>=num1 && i<num2){
-								s += '<tr id="'+i+'" class="list0"><td>'
-										+ '<div class="forumLeft"><span>班次：' + jsonReturn[i].classId + '</span>'
-										+ '<span>产品：' + jsonReturn[i].tenant + '</span>'
-										+ '<span>姓名：' + jsonReturn[i].forumusername + '</span>'
-										+ '<span>租户名：' + jsonReturn[i].name +'</span></div></td>'
-										+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'	+ jsonReturn[i].content	+ '</p></div><div class="forumSecond">';
-								if(jsonReturn[i].path !="" ){
-									s+= '<div class="forumSecond"> <a href="'+jsonReturn[i].path+'" target="_blank"><image height="360px" src="'+ jsonReturn[i].path+ '" alt=""/></a></div>';
-								}
-								s+= '</div><div class="forumThird"><span class="date">' + jsonReturn[i].time + '</span></div></td></tr>';
-							}
-						}
-						s += '</table><input type="hidden" id="taskslist" value="'+jsonReturn.length+'">'
-						s += '<a onclick="forumShow(1,0);">首页</a><a onclick="forumShow(0,-1);">上一页</a><a onclick="forumShow(0,1);">下一页</a><a onclick="forumShow('+totalPage+',0);">尾页</a> 总条数：'+totalNum;
-						$('#dv').html(s);
-						$("#forum").fadeIn(100);
-						$("#control").fadeOut(100);
-						$("#survey").fadeOut(100);
-						$("#notice").fadeOut(10);
-					},
-					error : function(data) {
-						alert("查询问题失败！");
-					}
-				});
+		$.ajax({
+			type : "GET",
+			url : url,
+			dataType : "json",
+			cache : false,
+			async : false,
+			data : {
+				classId : classIds
+			},
+			success : function(data) {
+				forumJson = eval(data);
+			},
+			error : function(data) {
+				alert("查询问题失败！");
+			}
+		});
 	}
+	function forumShow(current, cal) {
+	    getForums();
+	    var num1;
+	    var num2;
+	    $.session.set("menu", "forum");
+	    var classIds = $("#classId").find("option:selected").val();
+	    isLogin();
+	    var s = '<table class="forumTable" >';
+	    var totalNum = forumJson.length;
+	    var currentNum = parseInt($.session.get("curForum"));
+	    var totalPage = Math.ceil(totalNum / 10);
+	    if (cal != 0) {
+	    	currentNum += cal;
+	    	if (currentNum == 0) {
+	    		currentNum = 1;
+	    	}
+	    }
+	    if (current != 0) {
+	    	currentNum = current;
+	    }
+	    if (cal == 0 && current == 0) {
+	    	currentNum = 1;
+	    }
+	    if (totalNum == 0) {
+	    	totalPage = 1;
+	    }
+	    $.session.set("curForum", currentNum);
+	    num1 = (currentNum - 1) * 10;
+	    num2 = currentNum * 10;
+	    for (var i = 0; i < forumJson.length; i++) {
+	    	if (i >= num1 && i < num2) {
+	    		s += '<tr id="'
+	    				+ i
+	    				+ '" class="list0"><td>'
+	    				+ '<div class="forumLeft"><span>班次：'
+	    				+ forumJson[i].classId
+	    				+ '</span>'
+	    				+ '<span>产品：'
+	    				+ forumJson[i].tenant
+	    				+ '</span>'
+	    				+ '<span>姓名：'
+	    				+ forumJson[i].forumusername
+	    				+ '</span>'
+	    				+ '<span>租户名：'
+	    				+ forumJson[i].name
+	    				+ '</span></div></td>'
+	    				+ '<td><div class="forumMain"><div class="forumFirst"><p class="text">'
+	    				+ forumJson[i].content
+	    				+ '</p></div><div class="forumSecond">';
+	    		if (forumJson[i].path != "") {
+	    			s += '<div class="forumSecond"> <a href="' + forumJson[i].path
+	    					+ '" target="_blank"><image height="360px" src="'
+	    					+ forumJson[i].path + '" alt=""/></a></div>';
+	    		}
+	    		s += '</div><div class="forumThird"><span class="date">'
+	    				+ forumJson[i].time + '</span></div></td></tr>';
+	    	}
+	    }
+	    s += '</table><input type="hidden" id="taskslist" value="'
+	    		+ forumJson.length + '">'
+	    s += '<a onclick="forumShow(1,0);">首页</a><a onclick="forumShow(0,-1);">上一页</a><a onclick="forumShow(0,1);">下一页</a><a onclick="forumShow('
+	    		+ totalPage + ',0);">尾页</a> 总条数：' + totalNum;
+	    $('#dv').html(s);
+	    $("#forum").fadeIn(100);
+	    $("#control").fadeOut(100);
+	    $("#survey").fadeOut(100);
+	    $("#notice").fadeOut(10);
+    }
 	function uploadPic() {
 		$("#uploadButton").val("请等待 图片上传中...");
 		$("#uploadButton").attr("style", "background:#6B6B6B;");
@@ -965,6 +985,24 @@ var t = new Date();
             return 'Safari';
         }
     }
+    function exportForums(tableid) {
+    	var s = '<table id="exportTable"><tr><th>班次</th><th>姓名</th><th>账号</th><th>产品</th><th>时间</th><th>内容</th><th>路径</th></tr>';
+    	for (var i = 0; i < forumJson.length; i++) {
+    		s += '<tr id="' + i
+    		+ '"><td >' + forumJson[i].classId + '</td><td>'
+    		+ forumJson[i].forumusername + '</td><td>'
+    		+ forumJson[i].name + '</td><td>'
+    		+ forumJson[i].tenant + '</td><td>' + forumJson[i].time
+    		+ '</td><td>' + forumJson[i].content + '</td><td>'
+    		+ forumJson[i].path + '</td><td>'+ '</td></tr>';
+    	}
+    	s += '</table>';
+    	$('#exportExcel').html(s);
+    	
+    	identifyExplorer(tableid);
+    	
+    	$('#exportExcel').html("");
+    }
     function method5(tableid) {
     	var s = '<table id="exportTable"><tr><th>班次</th><th>邀请人</th><th>公司</th><th>行业</th><th>姓名</th><th>岗位</th><th>手机号</th><th>邮箱</th><th>公有云账户</th><th>邀请理由</th></tr>';
 	    for (var i = 0; i < jsonReturn.length; i++) {
@@ -981,33 +1019,37 @@ var t = new Date();
 	    s += '</table>';
 	    $('#exportExcel').html(s);
 	    
-        if(getExplorer()=='ie'){
-            var curTbl = document.getElementById(tableid);
-            var oXL = new ActiveXObject("Excel.Application");
-            var oWB = oXL.Workbooks.Add();
-            var xlsheet = oWB.Worksheets(1);
-            var sel = document.body.createTextRange();
-            sel.moveToElementText(curTbl);
-            sel.select();
-            sel.execCommand("Copy");
-            xlsheet.Paste();
-            oXL.Visible = true;
-
-            try {
-                var fname = oXL.Application.GetSaveAsFilename("Excel.xls", "Excel Spreadsheets (*.xls), *.xls");
-            } catch (e) {
-                print("Nested catch caught " + e);
-            } finally {
-                oWB.SaveAs(fname);
-                oWB.Close(savechanges = false);
-                oXL.Quit();
-                oXL = null;
-                idTmr = window.setInterval("Cleanup();", 1);
-            }
-        } else {
-            tableToExcel(tableid)
-        }
+	    identifyExplorer(tableid);
+	    
         $('#exportExcel').html("");
+    }
+    function identifyExplorer(tableid){
+    	if(getExplorer()=='ie'){
+    		var curTbl = document.getElementById(tableid);
+    		var oXL = new ActiveXObject("Excel.Application");
+    		var oWB = oXL.Workbooks.Add();
+    		var xlsheet = oWB.Worksheets(1);
+    		var sel = document.body.createTextRange();
+    		sel.moveToElementText(curTbl);
+    		sel.select();
+    		sel.execCommand("Copy");
+    		xlsheet.Paste();
+    		oXL.Visible = true;
+    		
+    		try {
+    			var fname = oXL.Application.GetSaveAsFilename("Excel.xls", "Excel Spreadsheets (*.xls), *.xls");
+    		} catch (e) {
+    			print("Nested catch caught " + e);
+    		} finally {
+    			oWB.SaveAs(fname);
+    			oWB.Close(savechanges = false);
+    			oXL.Quit();
+    			oXL = null;
+    			idTmr = window.setInterval("Cleanup();", 1);
+    		}
+    	} else {
+    		tableToExcel(tableid)
+    	}
     }
     function Cleanup() {
         window.clearInterval(idTmr);
