@@ -31,8 +31,8 @@ cse:
       refreshMode: 1
       refresh_interval: 5000
   credentials:
-    accessKey: SQXZYPSDEZAWY10RACO7
-    secretKey: zMgxdKKD9Fh5owFeZGNSBhgeE1iHk7YmLLm0J4Ns
+    accessKey: yourak
+    secretKey: yoursk
     akskCustomCipher: default
   executors:
     default: cse.executor.groupThreadPool
